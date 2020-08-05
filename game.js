@@ -4,6 +4,7 @@
  let character_x = 150;
  let character_y = 25;
  let character_energy = 100;
+ let collectedBottles = 0;
  let isMovingRight = false;
  let isMovingLeft = false;
  let bg_elements = 0;
@@ -20,19 +21,22 @@
  let allImgArrays = [characterGraphicsMoving, characterGraphicsStanding, characterGraphicsJumping, chickenGraphics, chickenGraphics];
  let allImgArraysPaths = ['./img/2.Secuencias_Personaje-Pepe-corrección/2.Secuencia_caminata/', './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/IDLE/', './img/2.Secuencias_Personaje-Pepe-corrección/3.Secuencia_salto/', './img/3.Secuencias_Enemy_básico/Versión_Gallinita/', './img/3.Secuencias_Enemy_básico/Versión_pollito/' ];
  let chickens = [];
-// let healthBarImg = ['0_.png','20_.png','40_.png','60_.png','80_.png','100_.png'];
-// let healthIndex = 0;
+ let placedBottles = [1560, 3070, 4500, 6800];
+ let bottleGraphicsStatic = ['1.Marcador.png', '2.Botella_enterrada1.png', '2.Botella_enterrada2.png'];
+ let bottleGraphicsRotating = ['botella_rotación1.png', 'botella_rotación2.png', 'botella_rotación3.png', 'botella_rotación4.png'];
  
  let images = []; // check if this array is needed
 
 
 
  // ----------- Game config
- let JUMP_TIME = 400; // in ms
- let GAME_SPEED = 12;
+ let JUMP_TIME = 500; // in ms
+ let GAME_SPEED = 11;
  let AUDIO_RUNNING = new Audio ('./audio/running.mp3');
  let AUDIO_JUMP = new Audio ('./audio/jump.mp3');
+ let AUDIO_BOTTLE = new Audio ('./audio/bottle.mp3');
  let COLLISION_ENERGY_LOSS = 20;
+ let COLLISION_BOTTLE_FILL = 20;
 
  function init() {
     canvas = document.getElementById('canvas');
@@ -50,22 +54,44 @@
 
  function checkForCollision() {
      setInterval(function(){
-        for (let i = 0; i < chickens.length; i++) {
-             let chicken = chickens[i];
-             let chickenWidth = canvas.width * chicken.scale_x - 10; 
-             let chicken_x = bg_elements + chicken.position_x;  // calculates absolute position of chicken by taking background-movement into account
-             let characterHeight = character_image.height * 0.35;
-
-             if ((chicken_x - chickenWidth) < character_x && (chicken_x + chickenWidth) > character_x) { // defines range for x-position in which collision is detected
-                    if ((character_y + characterHeight) > chicken.position_y) {
-                    character_energy -= COLLISION_ENERGY_LOSS;
-                } 
-            } 
-            if (character_energy <= 0) {
-                alert('Game over!');
-            }
-        }
+        checkChickenCollision();
+        checkBottleCollision();
      },50);
+ }
+
+ function checkChickenCollision() {
+    for (let i = 0; i < chickens.length; i++) {
+        let chicken = chickens[i];
+        let chickenWidth = canvas.width * chicken.scale_x - 20; 
+        let chicken_x = bg_elements + chicken.position_x;  // calculates absolute position of chicken by taking background-movement into account
+        let characterHeight = character_image.height * 0.35;
+
+        if ((chicken_x - chickenWidth) < character_x && (chicken_x + chickenWidth) > character_x) { // defines range for x-position in which collision is detected
+               if ((character_y + characterHeight) > chicken.position_y) {
+               character_energy -= COLLISION_ENERGY_LOSS;
+           } 
+       } 
+       if (character_energy <= 0) {
+           alert('Game over!');  
+       }
+    }
+}
+ function checkBottleCollision() {
+     // check collision to pick-up bottle
+     for (let i = 0; i < placedBottles.length; i++) {
+        let bottle = placedBottles[i];
+        let bottleWidth = (canvas.width * 0.125)/2; 
+        let bottle_x = bg_elements + placedBottles[i];  
+        let characterHeight = character_image.height * 0.35;
+
+        if ((bottle_x - bottleWidth) < character_x && (bottle_x + bottleWidth) > character_x) { // defines range for x-position in which collision is detected
+              if ((character_y + characterHeight) > 430) {
+                placedBottles.splice(i, 1);  // removes bottle from canvas when picked up
+                AUDIO_BOTTLE.play();
+                collectedBottles += COLLISION_BOTTLE_FILL;
+           }; 
+       }; 
+   };
  }
 
  function calculateChickenPosition() {
@@ -85,8 +111,9 @@
     chickens = [
         createChicken(gallinitaPath, 2* canvas.width ),
         createChicken(pollitoPath, 1.8 * canvas.width), 
-        createChicken(pollitoPath, 3 * canvas.width), 
-        createChicken(gallinitaPath, 4.2 * canvas.width)
+        createChicken(gallinitaPath, 4.5* canvas.width ),
+        createChicken(pollitoPath, 3.3 * canvas.width), 
+        createChicken(pollitoPath, 5.6 * canvas.width)
     ]
  }
  
@@ -151,24 +178,44 @@ function preloadImages(){
  function draw() {
      setInterval(function() {
         drawBackground();
+        drawEnergyBar();
+        drawBottleBar();
         updateCharacter();
         drawChicken();
-        drawEnergyBar();
+        drawBottles();
+
      }, 30);
 
     //requestAnimationFrame(draw);
  }
 
+ function drawBottleBar() {
+    let bottleBarPath = './img/7.Marcadores/Barra/Marcador_botella/Azul/' + collectedBottles + '_.png';
+    addBackgroundObject( bottleBarPath, 25 - bg_elements, 100, 0.3, 0.15, 0,6);
+
+}
+ function drawBottles() {
+     for (let i = 0; i < placedBottles.length; i++) {
+         let index = i % bottleGraphicsStatic.length;
+         let bottleImg = './img/6.botella/' + bottleGraphicsStatic[index];
+         let bottle_x = placedBottles[i]; 
+         addBackgroundObject(bottleImg, bottle_x, 430, 0.125, 0.225);
+     }
+ }
+
  function drawEnergyBar() {
      let energyBarPath = './img/7.Marcadores/Barra/Marcador vida/azul/' + character_energy + '_.png';
-     addBackgroundObject( energyBarPath, 730 - bg_elements, 80, 0.3, 0.15, 0,6);
+     addBackgroundObject( energyBarPath, 730 - bg_elements, 100, 0.3, 0.15, 0,6);
 
  }
 
  function drawChicken() {
+    let currentChickenIndex = 0;
+    let index = currentChickenIndex % chickenGraphics.length;
     for (let k = 0; k < chickens.length; k++) {
         let chicken = chickens[k];
-        addBackgroundObject(chicken.img_path + chickenGraphics[k], chicken.position_x, chicken.position_y, chicken.scale_x ,chicken.scale_y);
+        addBackgroundObject(chicken.img_path + chickenGraphics[index], chicken.position_x, chicken.position_y, chicken.scale_x ,chicken.scale_y);
+        currentChickenIndex++;
     }
     
 }
@@ -193,7 +240,6 @@ function updateCharacter(){
         character_y -= GAME_SPEED * 1.5;
     } else {
         // check falling
-
         if (character_y < 25){
             character_y += GAME_SPEED * 1.5;
         }
@@ -205,7 +251,6 @@ function updateCharacter(){
             ctx.translate(character_image.width -60, 0);
             ctx.scale(-1,1);
         };
-
         ctx.drawImage(character_image, character_x, character_y, character_image.width * 0.35, character_image.height *  0.35);
         ctx.restore();    
     };
@@ -221,12 +266,12 @@ function updateCharacter(){
  function drawGround() {
     if (isMovingRight) {
         bg_elements -= GAME_SPEED;
-    } else if (isMovingLeft) {
+    } else if (isMovingLeft && bg_elements < 800) {
         bg_elements += GAME_SPEED;
     }
     // creates background automatically 
     let currentFondIndex = 0;
-     for (let i=0; i < 10; i++) {
+     for (let i=-1; i < 10; i++) {
         let index = currentFondIndex % fondImg.length;
         addBackgroundObject('./img/5.Fondo/Capas/5.cielo_1920-1080px.png', i * canvas.width, 0, 1, 1.2);
         addBackgroundObject('./img/5.Fondo/Capas/3.Fondo3/' + fondImg[index], i * canvas.width, 0, 1, 1.2, 0.8);
@@ -279,4 +324,4 @@ function updateCharacter(){
             isMovingLeft = false;
         }; 
      });
- }
+}
