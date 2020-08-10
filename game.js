@@ -17,13 +17,15 @@
  let characterGraphicsJumping = ['J-31.png','J-31.png','J-32.png','J-32.png','J-33.png','J-33.png','J-34.png','J-34.png','J-35.png','J-35.png','J-36.png','J-36.png','J-37.png','J-37.png','J-38.png','J-38.png','J-39.png','J-39.png'];
  let characterGraphicIndex = 0;
  let cloudOffset = 0;
- let chickenGraphics = ['1.Paso_derecho.png', '2.Centro.png', '3.Paso_izquierdo.png'];
+ let chickenGraphics = ['1.Paso_derecho.png','1.Paso_derecho.png','1.Paso_derecho.png', '2.Centro.png', '2.Centro.png', '2.Centro.png', '3.Paso_izquierdo.png', '3.Paso_izquierdo.png', '3.Paso_izquierdo.png' ];
+ let currentChickenIndex = 0;
  let allImgArrays = [characterGraphicsMoving, characterGraphicsStanding, characterGraphicsJumping, chickenGraphics, chickenGraphics];
  let allImgArraysPaths = ['./img/2.Secuencias_Personaje-Pepe-corrección/2.Secuencia_caminata/', './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/IDLE/', './img/2.Secuencias_Personaje-Pepe-corrección/3.Secuencia_salto/', './img/3.Secuencias_Enemy_básico/Versión_Gallinita/', './img/3.Secuencias_Enemy_básico/Versión_pollito/' ];
  let chickens = [];
- let placedBottles = [1560, 3070, 4500, 6800];
+ let placedBottles = [1560, 3070, 4500, 6800, 508, 7400];
  let bottleGraphicsStatic = ['1.Marcador.png', '2.Botella_enterrada1.png', '2.Botella_enterrada2.png'];
  let bottleGraphicsRotating = ['botella_rotación1.png', 'botella_rotación2.png', 'botella_rotación3.png', 'botella_rotación4.png'];
+ let bottleThrowTime = 0;
  
  let images = []; // check if this array is needed
 
@@ -65,14 +67,16 @@
         let chickenWidth = canvas.width * chicken.scale_x - 20; 
         let chicken_x = bg_elements + chicken.position_x;  // calculates absolute position of chicken by taking background-movement into account
         let characterHeight = character_image.height * 0.35;
+        let characterWidth = character_image.width * 0.35 - 125;
 
-        if ((chicken_x - chickenWidth) < character_x && (chicken_x + chickenWidth) > character_x) { // defines range for x-position in which collision is detected
+        if ((chicken_x - chickenWidth/2) < (character_x + characterWidth/2) && (chicken_x + chickenWidth/2) > (character_x )) { // defines range for x-position in which collision is detected
                if ((character_y + characterHeight) > chicken.position_y) {
                character_energy -= COLLISION_ENERGY_LOSS;
            } 
        } 
        if (character_energy <= 0) {
            alert('Game over!');  
+           AUDIO_RUNNING.pause(); // pauses running audio when game over
        }
     }
 }
@@ -183,10 +187,30 @@ function preloadImages(){
         updateCharacter();
         drawChicken();
         drawBottles();
+        drawBottleThrow();
 
      }, 30);
 
     //requestAnimationFrame(draw);
+ }
+
+ function drawBottleThrow() {
+        
+    if (bottleThrowTime) {
+        let timePassed = new Date().getTime() - bottleThrowTime;
+        let gravity = Math.pow(9.81, timePassed / 300);
+        let bottle_x = character_x + 60 + timePassed * 0.9;
+        let bottle_y = 260 - (timePassed * 0.55 - gravity);
+
+    // for (let i = 0; i < bottleGraphicsRotating.length; i++) {
+        let i = 0;    
+        let index = i % bottleGraphicsRotating.length;
+        let base_image = new Image();
+        base_image.src = './img/6.botella/Rotación/' + bottleGraphicsRotating[index];
+
+        ctx.drawImage(base_image, bottle_x, bottle_y, base_image.width * 0.3, base_image.height *  0.25);
+       // }
+    }
  }
 
  function drawBottleBar() {
@@ -210,9 +234,10 @@ function preloadImages(){
  }
 
  function drawChicken() {
-    let currentChickenIndex = 0;
-    let index = currentChickenIndex % chickenGraphics.length;
+    
+   
     for (let k = 0; k < chickens.length; k++) {
+        let index = currentChickenIndex % chickenGraphics.length;
         let chicken = chickens[k];
         addBackgroundObject(chicken.img_path + chickenGraphics[index], chicken.position_x, chicken.position_y, chicken.scale_x ,chicken.scale_y);
         currentChickenIndex++;
@@ -297,6 +322,7 @@ function updateCharacter(){
  function listenForKeys() {
      document.addEventListener("keydown", e => {
         const k = e.key;
+
         if (k == 'ArrowRight') {
             isMovingRight = true;
         };
@@ -313,6 +339,13 @@ function updateCharacter(){
         if (e.code == 'Space' && timePassedSinceJump > JUMP_TIME * 2) { 
             lastJumpStarted = new Date().getTime();
         } 
+
+        if (k == 'd' && collectedBottles > 0) {
+            let timePassed = new Date().getTime() - bottleThrowTime;
+            if (timePassed > 1000) {
+                collectedBottles -= COLLISION_BOTTLE_FILL; 
+                bottleThrowTime = new Date().getTime();
+            }}
      }); 
      
      document.addEventListener("keyup", e => {
