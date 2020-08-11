@@ -1,6 +1,8 @@
  let canvas;
  let ctx;
  let character_image;  
+ let characterHeight;
+ let characterWidth;
  let character_x = 150;
  let character_y = 25;
  let character_energy = 100;
@@ -23,12 +25,16 @@
  let allImgArraysPaths = ['./img/2.Secuencias_Personaje-Pepe-corrección/2.Secuencia_caminata/', './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/IDLE/', './img/2.Secuencias_Personaje-Pepe-corrección/3.Secuencia_salto/', './img/3.Secuencias_Enemy_básico/Versión_Gallinita/', './img/3.Secuencias_Enemy_básico/Versión_pollito/' ];
  let chickens = [];
  let placedBottles = [1560, 3070, 4500, 6800, 508, 7400];
+ let bottle_y = 430;
  let bottleGraphicsStatic = ['1.Marcador.png', '2.Botella_enterrada1.png', '2.Botella_enterrada2.png'];
- let bottleGraphicsRotating = ['botella_rotación1.png','botella_rotación1.png','botella_rotación1.png', 'botella_rotación2.png', 'botella_rotación2.png', 'botella_rotación2.png', 'botella_rotación3.png', 'botella_rotación3.png', 'botella_rotación3.png', 'botella_rotación4.png', 'botella_rotación4.png', 'botella_rotación4.png'];
+ let bottleGraphicsRotating = ['botella_rotación1.png','botella_rotación1.png', 'botella_rotación2.png', 'botella_rotación2.png', 'botella_rotación3.png', 'botella_rotación3.png', 'botella_rotación4.png', 'botella_rotación4.png'];
  let bottleThrowTime = 0;
  let thrownBottleX = 0;
  let thrownBottleY = 0;
  let boss_energy = 100;
+ let boss_x = 1000;
+ let boss_y = 130;
+ let bottle_base_image = new Image();
 
  
  let images = []; // check if this array is needed
@@ -52,9 +58,10 @@
     createChickenList();
     checkForRunning();
     calculateCloudOffset();
+    calculateChickenPosition();
+    calculateBottleThrow();
     draw();
     listenForKeys();
-    calculateChickenPosition();
     checkForCollision();
  }
 
@@ -67,8 +74,7 @@
  }
 
  function checkBossCollision() {
-    // thrownBottleX += bg_elements;
-    if ( thrownBottleX > (1000 + bg_elements - 50) && thrownBottleX < (1000 + 50 + bg_elements)) {
+     if ( checkCollisionCondition(thrownBottleX, 30, boss_x, 300, thrownBottleY, 50, boss_y)) {
         if (boss_energy > 0) {
             boss_energy -= COLLISION_ENERGY_LOSS;
             console.log('boss_energy: ' + boss_energy)    
@@ -78,39 +84,44 @@
     }
 } 
 
+function checkCollisionCondition(collider_1_x, collider_1_width, collider_2_x, collider_2_width, collider_2_y, collider_2_height, collider_1_y) {
+    collider_1_x += bg_elements; // add movement of background
+     // defines range for x-position in which collision is detected
+    let x_condition = ((collider_1_x - collider_1_width/2) < (collider_2_x + collider_2_width/2) && (collider_1_x + collider_1_width/2) > (collider_2_x + collider_2_width/2));
+    // defines range for y-position in which collision is detected
+    let y_condition = ((collider_2_y + collider_2_height) > collider_1_y) ;
+    return (x_condition && y_condition);
+}
+
 function checkChickenCollision() {
     for (let i = 0; i < chickens.length; i++) {
         let chicken = chickens[i];
         let chickenWidth = canvas.width * chicken.scale_x - 20; 
-        let chicken_x = bg_elements + chicken.position_x;  // calculates absolute position of chicken by taking background-movement into account
-        let characterHeight = character_image.height * 0.35;
-        let characterWidth = character_image.width * 0.35 - 125;
+        let chicken_x = chicken.position_x;  // calculates absolute position of chicken by taking background-movement into account
+        characterWidth = character_image.width * 0.35 - 125;
+        
+        if (checkCollisionCondition(chicken_x, chickenWidth, character_x, characterWidth, character_y, characterHeight, chicken.position_y)) {             
+            character_energy -= COLLISION_ENERGY_LOSS;  // reduce energy when hit by enemy
 
-        if ((chicken_x - chickenWidth/2) < (character_x + characterWidth/2) && (chicken_x + chickenWidth/2) > (character_x )) { // defines range for x-position in which collision is detected
-               if ((character_y + characterHeight) > chicken.position_y) {
-               character_energy -= COLLISION_ENERGY_LOSS;
-           } 
-       } 
-       if (character_energy <= 0) {
-           alert('Game over!');  
-           AUDIO_RUNNING.pause(); // pauses running audio when game over
-       }
+            if (character_energy <= 0) {
+                alert('Game over!');    // game over if character energy
+                AUDIO_RUNNING.pause(); // pauses running audio when game over
+            }
+        }
     }
 }
+
  function checkBottleCollision() {
      // check collision to pick-up bottle
      for (let i = 0; i < placedBottles.length; i++) {
-        let bottleWidth = (canvas.width * 0.125)/2; 
-        let bottle_x = bg_elements + placedBottles[i];  
-        let characterHeight = character_image.height * 0.35;
+        let bottleWidth = (canvas.width * 0.125); 
+        let bottle_x = placedBottles[i];  
 
-        if ((bottle_x - bottleWidth) < character_x && (bottle_x + bottleWidth) > character_x) { // defines range for x-position in which collision is detected
-              if ((character_y + characterHeight) > 430) {
-                placedBottles.splice(i, 1);  // removes bottle from canvas when picked up
-                AUDIO_BOTTLE.play();
-                collectedBottles += COLLISION_BOTTLE_FILL;
-           }; 
-       }; 
+        if (checkCollisionCondition(bottle_x, bottleWidth, character_x, characterWidth, character_y, characterHeight, bottle_y)) { 
+            placedBottles.splice(i, 1);  // removes bottle from canvas when picked up
+            AUDIO_BOTTLE.play();
+            collectedBottles += COLLISION_BOTTLE_FILL;
+    }; 
    };
  }
 
@@ -139,18 +150,13 @@ function checkChickenCollision() {
  
 
 function preloadImages(){
-   /*
-    for (let i = 0; i < preloadImages.arguments.length; i++) {
-        images[i] = new Image();
-        images[i].src = preloadImages.arguments[i];
-    } */
-
     for (let j = 0; j < allImgArrays.length; j++ ) {
         let currentArray = allImgArrays[j];
     
         for (let k=0; k < currentArray.length; k++) {
             let image = new Image();
             image.src = allImgArraysPaths[j] + currentArray[k];
+            // console.log('Preload image', allImgArraysPaths[j] + currentArray[k]);
             images.push(image.src); // push image-path to images-array (which contains all image-paths)
         }
     }
@@ -162,8 +168,24 @@ function preloadImages(){
     }, 100);
  }
 
+ function calculateBottleThrow(){
+    setInterval(function(){
+       if (bottleThrowTime) {
+           let timePassed = new Date().getTime() - bottleThrowTime;
+           let gravity = Math.pow(9.81, timePassed / 300);
+           thrownBottleX = character_x + 60 + timePassed * 0.9;
+           thrownBottleY = 260 - (timePassed * 0.55 - gravity);
+
+           let i = 0;
+           let index = i % bottleGraphicsRotating.length;
+           bottle_base_image.src = './img/6.botella/Rotación/' + bottleGraphicsRotating[index];
+           i++;
+       }
+    }, 50);
+}
+
  function checkForRunning() {  
-    let interval = setInterval(function() {
+    setInterval(function() {
         timePassedSinceJump = new Date().getTime() - lastJumpStarted;
         let isJumping = timePassedSinceJump < JUMP_TIME * 2;
 
@@ -184,9 +206,6 @@ function preloadImages(){
         else if (!isMovingLeft && !isMovingRight && !isJumping) {
             let index = characterGraphicIndex % characterGraphicsStanding.length;
             currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/IDLE/' + characterGraphicsStanding[index];
-
-            //clearInterval(interval); // stops current interval
-            //checkForRunning(100); // calls function with prolonged interval-time to slow down animation of standing character
         }
         if (!isMovingLeft && !isMovingRight || isJumping) {
             AUDIO_RUNNING.pause(); // pauses running audio when standing or jumping
@@ -211,30 +230,20 @@ function preloadImages(){
  }
 
  function drawFinalBoss() {
-    // draw walking sequence
-    for (let k = 0; k < 4; k++) {
+    let k = 0;
+    while(k < 4) {
         let index = (k+1) % 5;
         let bossImgPathWalking = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/1.Caminata/G';
-        addBackgroundObject(bossImgPathWalking + index + '.png', 1000, 130, 0.4 , 0.9);
-     }
-
+        addBackgroundObject(bossImgPathWalking + index + '.png', boss_x, boss_y, 0.4 , 0.9);
+        k++;
+        // if (k == 4) {
+        //      k = 0;
+        // }
+    } 
  }
 
  function drawBottleThrow() { 
-    if (bottleThrowTime) {
-        let timePassed = new Date().getTime() - bottleThrowTime;
-        let gravity = Math.pow(9.81, timePassed / 300);
-        thrownBottleX = character_x + 60 + timePassed * 0.9;
-        thrownBottleY = 260 - (timePassed * 0.55 - gravity);
-
-        for (let i = 0; i < bottleGraphicsRotating.length; i++) {  
-            let index = i % bottleGraphicsRotating.length;
-            let base_image = new Image();
-            base_image.src = './img/6.botella/Rotación/' + bottleGraphicsRotating[index];
-
-            ctx.drawImage(base_image, thrownBottleX, thrownBottleY, base_image.width * 0.3, base_image.height *  0.25);
-        }
-    }
+    ctx.drawImage(bottle_base_image, thrownBottleX, thrownBottleY, bottle_base_image.width * 0.3, bottle_base_image.height *  0.25);
  }
 
  function drawBottleBar() {
@@ -247,7 +256,7 @@ function preloadImages(){
          let index = i % bottleGraphicsStatic.length;
          let bottleImg = './img/6.botella/' + bottleGraphicsStatic[index];
          let bottle_x = placedBottles[i]; 
-         addBackgroundObject(bottleImg, bottle_x, 430, 0.125, 0.225);
+         addBackgroundObject(bottleImg, bottle_x, bottle_y, 0.125, 0.225);
      }
  }
 
@@ -280,8 +289,17 @@ function createChicken(imgPath, position_x) {
 }
 
 function updateCharacter(){
-    character_image = new Image();
-    character_image.src = currentCharacterImg ;
+
+    // Load from cache
+    // Javasript find in array, filter Array, Sort Array
+    character_image = images.find(function(img) {
+        return img.src == currentCharacterImg;
+    });
+
+    if(!character_image) { // Image is not in cache, load from hdd
+        character_image = new Image();
+        character_image.src = currentCharacterImg ;
+    }
 
     let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
     
@@ -294,15 +312,21 @@ function updateCharacter(){
         }
     }
     if (character_image.complete) {
-        if (isMovingLeft) {
-            // flip character img horizontally when moving left
-            ctx.save();
-            ctx.translate(character_image.width -60, 0);
-            ctx.scale(-1,1);
-        };
-        ctx.drawImage(character_image, character_x, character_y, character_image.width * 0.35, character_image.height *  0.35);
-        ctx.restore();    
+        drawCharacter();
+    }
+}
+
+function drawCharacter() {
+    characterHeight = character_image.height *  0.35;
+    characterWidth = character_image.width * 0.35;
+    if (isMovingLeft) {
+        // flip character img horizontally when moving left
+        ctx.save();
+        ctx.translate(character_image.width -60, 0);
+        ctx.scale(-1,1);
     };
+    ctx.drawImage(character_image, character_x, character_y, characterWidth, characterHeight);
+    ctx.restore();    
 }
 
  function drawBackground(){ 
