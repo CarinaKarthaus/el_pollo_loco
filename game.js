@@ -4,7 +4,7 @@
  let character_x = 150;
  let character_y = 25;
  let character_energy = 100;
- let collectedBottles = 0;
+ let collectedBottles = 80;
  let isMovingRight = false;
  let isMovingLeft = false;
  let bg_elements = 0;
@@ -24,8 +24,12 @@
  let chickens = [];
  let placedBottles = [1560, 3070, 4500, 6800, 508, 7400];
  let bottleGraphicsStatic = ['1.Marcador.png', '2.Botella_enterrada1.png', '2.Botella_enterrada2.png'];
- let bottleGraphicsRotating = ['botella_rotación1.png', 'botella_rotación2.png', 'botella_rotación3.png', 'botella_rotación4.png'];
+ let bottleGraphicsRotating = ['botella_rotación1.png','botella_rotación1.png','botella_rotación1.png', 'botella_rotación2.png', 'botella_rotación2.png', 'botella_rotación2.png', 'botella_rotación3.png', 'botella_rotación3.png', 'botella_rotación3.png', 'botella_rotación4.png', 'botella_rotación4.png', 'botella_rotación4.png'];
  let bottleThrowTime = 0;
+ let thrownBottleX = 0;
+ let thrownBottleY = 0;
+ let boss_energy = 100;
+
  
  let images = []; // check if this array is needed
 
@@ -58,10 +62,23 @@
      setInterval(function(){
         checkChickenCollision();
         checkBottleCollision();
-     },50);
+        checkBossCollision();
+     }, 50);
  }
 
- function checkChickenCollision() {
+ function checkBossCollision() {
+    // thrownBottleX += bg_elements;
+    if ( thrownBottleX > (1000 + bg_elements - 50) && thrownBottleX < (1000 + 50 + bg_elements)) {
+        if (boss_energy > 0) {
+            boss_energy -= COLLISION_ENERGY_LOSS;
+            console.log('boss_energy: ' + boss_energy)    
+        } else {
+            console.log('Congrats, you won!');
+        }
+    }
+} 
+
+function checkChickenCollision() {
     for (let i = 0; i < chickens.length; i++) {
         let chicken = chickens[i];
         let chickenWidth = canvas.width * chicken.scale_x - 20; 
@@ -83,7 +100,6 @@
  function checkBottleCollision() {
      // check collision to pick-up bottle
      for (let i = 0; i < placedBottles.length; i++) {
-        let bottle = placedBottles[i];
         let bottleWidth = (canvas.width * 0.125)/2; 
         let bottle_x = bg_elements + placedBottles[i];  
         let characterHeight = character_image.height * 0.35;
@@ -188,28 +204,36 @@ function preloadImages(){
         drawChicken();
         drawBottles();
         drawBottleThrow();
-
+        drawFinalBoss();
      }, 30);
 
     //requestAnimationFrame(draw);
  }
 
- function drawBottleThrow() {
-        
+ function drawFinalBoss() {
+    // draw walking sequence
+    for (let k = 0; k < 4; k++) {
+        let index = (k+1) % 5;
+        let bossImgPathWalking = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/1.Caminata/G';
+        addBackgroundObject(bossImgPathWalking + index + '.png', 1000, 130, 0.4 , 0.9);
+     }
+
+ }
+
+ function drawBottleThrow() { 
     if (bottleThrowTime) {
         let timePassed = new Date().getTime() - bottleThrowTime;
         let gravity = Math.pow(9.81, timePassed / 300);
-        let bottle_x = character_x + 60 + timePassed * 0.9;
-        let bottle_y = 260 - (timePassed * 0.55 - gravity);
+        thrownBottleX = character_x + 60 + timePassed * 0.9;
+        thrownBottleY = 260 - (timePassed * 0.55 - gravity);
 
-    // for (let i = 0; i < bottleGraphicsRotating.length; i++) {
-        let i = 0;    
-        let index = i % bottleGraphicsRotating.length;
-        let base_image = new Image();
-        base_image.src = './img/6.botella/Rotación/' + bottleGraphicsRotating[index];
+        for (let i = 0; i < bottleGraphicsRotating.length; i++) {  
+            let index = i % bottleGraphicsRotating.length;
+            let base_image = new Image();
+            base_image.src = './img/6.botella/Rotación/' + bottleGraphicsRotating[index];
 
-        ctx.drawImage(base_image, bottle_x, bottle_y, base_image.width * 0.3, base_image.height *  0.25);
-       // }
+            ctx.drawImage(base_image, thrownBottleX, thrownBottleY, base_image.width * 0.3, base_image.height *  0.25);
+        }
     }
  }
 
@@ -229,20 +253,20 @@ function preloadImages(){
 
  function drawEnergyBar() {
      let energyBarPath = './img/7.Marcadores/Barra/Marcador vida/azul/' + character_energy + '_.png';
-     addBackgroundObject( energyBarPath, 730 - bg_elements, 100, 0.3, 0.15, 0,6);
+     addBackgroundObject( energyBarPath, 730 - bg_elements, 100, 0.3, 0.15, 0,6); 
+     
+     let energyBarPathBoss = './img/7.Marcadores/Barra/Marcador vida/naranja/' + boss_energy + '_.png';
+     addBackgroundObject( energyBarPathBoss, 1050, 150, 0.2, 0.10, 0,6);
 
  }
 
  function drawChicken() {
-    
-   
     for (let k = 0; k < chickens.length; k++) {
         let index = currentChickenIndex % chickenGraphics.length;
         let chicken = chickens[k];
         addBackgroundObject(chicken.img_path + chickenGraphics[index], chicken.position_x, chicken.position_y, chicken.scale_x ,chicken.scale_y);
         currentChickenIndex++;
-    }
-    
+    }   
 }
 function createChicken(imgPath, position_x) {
     return {
