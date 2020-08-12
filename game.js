@@ -206,36 +206,6 @@
         checkKeyup();
     }
 
-    function checkKeyup() {
-        document.addEventListener("keyup", e => {
-            const k = e.key;
-            if (k == 'ArrowRight') {
-                isMovingRight = false;
-                };
-            if (k == 'ArrowLeft') {
-                isMovingLeft = false;
-            }; 
-        });
-    }
-
-    function initiateBottleThrow(k) {
-        if (k == 'd' && collectedBottles > 0) {
-            let timePassed = new Date().getTime() - bottleThrowTime;
-            if (timePassed > 1000) {
-                collectedBottles -= COLLISION_BOTTLE_FILL; 
-                bottleThrowTime = new Date().getTime();
-            }
-        }
-    }
-
-    function preventDoubleJumping(e) {
-        // prevent double-jumping
-        timePassedSinceJump = new Date().getTime() - lastJumpStarted;
-        if (e.code == 'Space' && timePassedSinceJump > JUMP_TIME * 2) { 
-            lastJumpStarted = new Date().getTime();
-        } 
-    }
-
     function checkKeydown(k, e) {
         if (k == 'ArrowRight') {
             isMovingRight = true;
@@ -248,3 +218,35 @@
             AUDIO_JUMP.play();
         }
     }
+
+    function preventDoubleJumping(e) {
+        // prevent double-jumping
+        timePassedSinceJump = new Date().getTime() - lastJumpStarted;
+        if (e.code == 'Space' && timePassedSinceJump > JUMP_TIME * 2) { 
+            lastJumpStarted = new Date().getTime();
+        } 
+    }
+
+    function initiateBottleThrow(k) {
+        if (k == 'd' && collectedBottles > 0) {
+            let timePassed = new Date().getTime() - bottleThrowTime;
+            if (timePassed > 1000) {
+                collectedBottles -= COLLISION_BOTTLE_FILL; 
+                bottleThrowTime = new Date().getTime();
+            }
+        }
+    }
+
+    function checkKeyup() {
+        document.addEventListener("keyup", e => {
+            const k = e.key;
+            if (k == 'ArrowRight') {
+                isMovingRight = false;
+                };
+            if (k == 'ArrowLeft') {
+                isMovingLeft = false;
+            }; 
+        });
+    }
+
+ 

@@ -11,8 +11,13 @@ let chickenGraphics = ['1.Paso_derecho.png','1.Paso_derecho.png','1.Paso_derecho
 let currentChickenIndex = 0;
 let bottleGraphicsStatic = ['1.Marcador.png', '2.Botella_enterrada1.png', '2.Botella_enterrada2.png'];
 let bottleGraphicsRotating = ['botella_rotación1.png','botella_rotación1.png', 'botella_rotación2.png', 'botella_rotación2.png', 'botella_rotación3.png', 'botella_rotación3.png', 'botella_rotación4.png', 'botella_rotación4.png'];
-let allImgArrays = [characterGraphicsMoving, characterGraphicsStanding, characterGraphicsJumping, chickenGraphics, chickenGraphics];
-let allImgArraysPaths = ['./img/2.Secuencias_Personaje-Pepe-corrección/2.Secuencia_caminata/', './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/IDLE/', './img/2.Secuencias_Personaje-Pepe-corrección/3.Secuencia_salto/', './img/3.Secuencias_Enemy_básico/Versión_Gallinita/', './img/3.Secuencias_Enemy_básico/Versión_pollito/' ];
+let bossGraphicsWalking = ['G1.png', 'G1.png', 'G1.png', 'G2.png','G2.png','G2.png', 'G3.png', 'G3.png', 'G3.png', 'G4.png', 'G4.png', 'G4.png' ];
+let bossGraphicsAngry = ['G5.png','G5.png','G5.png', 'G6.png', 'G6.png', 'G6.png', 'G7.png', 'G7.png', 'G7.png', 'G8.png', 'G8.png', 'G8.png', 'G9.png', 'G9.png', 'G9.png', 'G10.png', 'G10.png', 'G10.png', 'G11.png','G11.png','G11.png', 'G12.png', 'G12.png', 'G12.png' ];
+let bossGraphicsAttacking = ['G13.png','G13.png','G13.png', 'G14.png', 'G14.png', 'G14.png', 'G15.png', 'G15.png', 'G15.png', 'G16.png', 'G16.png', 'G16.png', 'G17.png', 'G17.png', 'G17.png', 'G18.png', 'G18.png', 'G18.png', 'G19.png','G19.png','G19.png', 'G20.png', 'G20.png', 'G20.png'];
+let bossGraphicsDead = ['G24.png','G24.png','G24.png','G25.png','G25.png','G25.png','G26.png','G26.png','G26.png'];
+let currentBossIndex = 0;
+let allImgArrays = [characterGraphicsMoving, characterGraphicsStanding, characterGraphicsJumping, chickenGraphics, chickenGraphics, bossGraphicsWalking, bossGraphicsAngry, bossGraphicsAttacking];
+let allImgArraysPaths = ['./img/2.Secuencias_Personaje-Pepe-corrección/2.Secuencia_caminata/', './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/IDLE/', './img/2.Secuencias_Personaje-Pepe-corrección/3.Secuencia_salto/', './img/3.Secuencias_Enemy_básico/Versión_Gallinita/', './img/3.Secuencias_Enemy_básico/Versión_pollito/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/1.Caminata/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/1.Alerta/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/2.Ataque/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/4.Muerte/' ];
 let bottle_base_image = new Image();
 
 let images = []; // check if this array is needed
@@ -27,7 +32,7 @@ function draw() {
        drawBottles();
        drawBottleThrow();
        drawFinalBoss();
-    }, 30);
+    }, 50);
 
    //requestAnimationFrame(draw);
 }
@@ -74,16 +79,27 @@ function draw() {
  */
 
     function drawFinalBoss() {
-        let k = 0;
-        while(k < 4) {
-            let index = (k+1) % 5;
-            let bossImgPathWalking = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/1.Caminata/G';
-            addBackgroundObject(bossImgPathWalking + index + '.png', boss_x, boss_y, 0.4 , 0.9);
-            k++;
-            // if (k == 4) {
-            //      k = 0;
-            // }
-        } 
+        //setInterval(function() { 
+        let index;
+        let bossImgPath;
+        // Change boss-movement when he gets attacked
+        if (boss_energy == 100) {
+            index = currentBossIndex % bossGraphicsWalking.length;
+            bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/1.Caminata/' + bossGraphicsWalking[index];
+        } else if (boss_energy == 80) {
+            index = currentBossIndex % bossGraphicsAngry.length;
+            bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/1.Alerta/' + bossGraphicsAngry[index];
+        } else if (boss_energy < 80) {
+            index = currentBossIndex % bossGraphicsAttacking.length;
+            bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/2.Ataque/' + bossGraphicsAttacking[index];
+        } else if (boss_energy <= 0) {
+            index = currentBossIndex % bossGraphicsDead.length;
+            bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/4.Muerte/' + bossGraphicsDead[index];
+        }
+           
+        addBackgroundObject(bossImgPath, boss_x, boss_y, 0.4 , 0.9);
+        currentBossIndex++;            
+        //} , 50); 
     }
     function drawChicken() {
         for (let k = 0; k < chickens.length; k++) {
@@ -134,14 +150,37 @@ function draw() {
     function addBackgroundObject(src, offsetX, offsetY, scaleX, scaleY, opacity){
         if (opacity) {
             ctx.globalAlpha = opacity;
-        }
+        }    
+	
         let base_image = new Image();
-        base_image.src = src;
+            base_image.src = src;
+            if (base_image.complete) {
+                ctx.drawImage(base_image, offsetX + bg_elements, -100 + offsetY, (canvas.width +1) * scaleX , canvas.height * scaleY);
+            };
+            ctx.globalAlpha = 1;
+    }
+
+
+        /*  Test version: preloading addBackgroundObjectImages
+        function addBackgroundObject(src, offsetX, offsetY, scaleX, scaleY, opacity){
+        if (opacity) {
+            ctx.globalAlpha = opacity;
+        }
+        let base_image = images.find(function(img) {
+            return img.src == src;
+        });
+
+        if (!base_image) {
+            base_image = new Image();
+            base_image.src = src;
+        }
         if (base_image.complete) {
             ctx.drawImage(base_image, offsetX + bg_elements, -100 + offsetY, (canvas.width +1) * scaleX , canvas.height * scaleY);
         };
         ctx.globalAlpha = 1;
     }
+    */
+
 
     function calculateCloudOffset(){
         setInterval(function() {
