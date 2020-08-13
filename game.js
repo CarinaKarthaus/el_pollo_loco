@@ -8,9 +8,10 @@
  let character_x = 150;
  let character_y = 25;
  let character_energy = 100;
- let collectedBottles = 80;
+ let collectedBottles = 100;
  let isMovingRight = false;
  let isMovingLeft = false;
+ let isSleeping = false;
  let bg_elements = 0;
  let timePassedSinceJump = 0; 
  let lastJumpStarted = 0;
@@ -23,12 +24,15 @@
  let boss_energy = 100;
  let boss_x = 1000;
  let boss_y = 130;
-
+ let currentTime = new Date().getTime();
+ let timeSinceLastKeydown = 0;
+ let timeSinceLastCollision = 4000;
+ let timeOfCollision = 0;
 
 
  // ----------- Game config
  let JUMP_TIME = 500; // in ms
- let GAME_SPEED = 11;
+ let GAME_SPEED = 12;
  let AUDIO_RUNNING = new Audio ('./audio/running.mp3');
  let AUDIO_JUMP = new Audio ('./audio/jump.mp3');
  let AUDIO_BOTTLE = new Audio ('./audio/bottle.mp3');
@@ -41,14 +45,12 @@
     
     preloadImages();
     createChickenList();
-    checkCharacterMovement();
-    calculateCloudOffset();
-    calculateChickenPosition();
-    calculateBottleThrow();
+    calculateDrawingDetails();
     draw();
     listenForKeys();
     checkForCollision();
  }
+
 
  /**
   * Check for collisions
@@ -59,11 +61,11 @@
             checkChickenCollision();
             checkBottleCollision();
             checkBossCollision();
-        }, 50);
+        }, 100);
     }
 
     function checkBossCollision() {
-        if ( checkCollisionCondition(thrownBottleX, 30, boss_x, 300, thrownBottleY, 50, boss_y)) {
+        if ( checkCollisionCondition(thrownBottleX, 30, boss_x, 600, thrownBottleY, 50, boss_y)) {
             if (boss_energy > 0) {
                 boss_energy -= COLLISION_ENERGY_LOSS;
                 console.log('boss_energy: ' + boss_energy)    
@@ -83,13 +85,16 @@
     }
 
     function checkChickenCollision() {
+        timeSinceLastCollision = new Date().getTime() - timeOfCollision;
         for (let i = 0; i < chickens.length; i++) {
             let chicken = chickens[i];
-            let chickenWidth = canvas.width * chicken.scale_x - 20; 
+            let chickenWidth = canvas.width * chicken.scale_x; 
             let chicken_x = chicken.position_x;  // calculates absolute position of chicken by taking background-movement into account
-            characterWidth = character_image.width * 0.35 - 125;
+            characterWidth = character_image.width * 0.35 - 75;
             
-            if (checkCollisionCondition(chicken_x, chickenWidth, character_x, characterWidth, character_y, characterHeight, chicken.position_y)) {        
+            // Character energy reduced if he collides with enemy AND enough time has passed since last collision
+            if (timeSinceLastCollision > 750 && checkCollisionCondition(chicken_x, chickenWidth, character_x, characterWidth, character_y, characterHeight, chicken.position_y)) {        
+                timeOfCollision = new Date().getTime();
                 reduceCharacterEnergy();
             }
         }
@@ -97,7 +102,7 @@
 
     function reduceCharacterEnergy() {
         character_energy -= COLLISION_ENERGY_LOSS;  // reduce energy when hit by enemy
-    
+        
         if (character_energy <= 0) {
             alert('Game over!');    // game over if character energy
             AUDIO_RUNNING.pause(); // pauses running audio when game over
@@ -110,7 +115,7 @@
            let bottleWidth = (canvas.width * 0.125); 
            let bottle_x = placedBottles[i];  
    
-           if (checkCollisionCondition(bottle_x, bottleWidth, character_x, characterWidth, character_y, characterHeight, bottle_y)) { 
+           if (checkCollisionCondition(bottle_x, bottleWidth, character_x, (characterWidth -75), character_y, characterHeight, bottle_y)) { 
                pickBottle(i);
            }; 
        };
@@ -165,19 +170,43 @@
  /**
   * Create and calculate character 
   */
+    function calculateDrawingDetails() {
+        checkCharacterMovement();
+        calculateCloudOffset();
+        calculateChickenPosition();
+        calculateBottleThrow();
+    }
+
     function checkCharacterMovement() {  
         setInterval(function() {
             timePassedSinceJump = new Date().getTime() - lastJumpStarted;
-            let isJumping = timePassedSinceJump < JUMP_TIME * 2;
 
-            animateRunningCharacter();
-            animateJumpingCharacter(isJumping);
-            animateStandingCharacter(isJumping);
-            if (!isMovingLeft && !isMovingRight || isJumping) {
-                AUDIO_RUNNING.pause(); // pauses running audio when standing or jumping
-            }
+            checkIfSleeping();
+            animateCharacter();
+            
             characterGraphicIndex++;
         }, 50);
+    }
+
+    function checkIfSleeping() {
+        currentTime = new Date().getTime();
+            if ((currentTime - timeSinceLastKeydown) > 5000) {
+                isSleeping = true;
+            } else {
+                isSleeping = false;
+            }
+    }
+
+    function animateCharacter() {
+        let isJumping = timePassedSinceJump < JUMP_TIME * 2;
+        // Check conditions for character-movements and animate if true
+        animateRunningCharacter();
+        animateJumpingCharacter(isJumping);
+        animateStandingCharacter(isJumping);
+        animateSleepingCharacter(isJumping);
+        if (!isMovingLeft && !isMovingRight || isJumping) {
+            AUDIO_RUNNING.pause(); // pauses running audio when standing or jumping
+        }
     }
 
     function calculateJumpingSequence(timePassedSinceJump) {
@@ -195,15 +224,26 @@
  */
 
     function listenForKeys() {
-        document.addEventListener("keydown", e => {
-            const k = e.key;
+        if (character_energy <= 0) {
+            alert('Game over!');
+        } else {
+            document.addEventListener("keydown", e => {
+                const k = e.key;
+         
+                checkKeydown(k, e);
+                saveKeydownTime(k, e); 
+                preventDoubleJumping(e); 
+                initiateBottleThrow(k);           
+            }); 
+            checkKeyup();    
+        }
+    }
 
-            checkKeydown(k, e);
-            preventDoubleJumping(e); 
-            initiateBottleThrow(k);
-        }); 
-
-        checkKeyup();
+    function saveKeydownTime(k, e) {
+        // save time of last keydown to detect inactivity
+        if (k || e.code) {
+            timeSinceLastKeydown = new Date().getTime();        
+        }
     }
 
     function checkKeydown(k, e) {
@@ -217,6 +257,7 @@
             characterGraphicIndex = 0;
             AUDIO_JUMP.play();
         }
+
     }
 
     function preventDoubleJumping(e) {

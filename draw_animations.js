@@ -5,6 +5,9 @@ let currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/
 let characterGraphicsMoving = ['W-21.png', 'W-22.png','W-23.png', 'W-24.png','W-25.png', 'W-26.png'];
 let characterGraphicsStanding = ['I-1.png','I-1.png','I-1.png','I-2.png','I-2.png','I-2.png','I-3.png','I-3.png','I-3.png','I-4.png','I-4.png','I-4.png','I-5.png','I-5.png','I-5.png','I-6.png','I-6.png','I-6.png','I-7.png','I-7.png','I-7.png','I-8.png','I-8.png','I-8.png','I-9.png','I-9.png','I-9.png','I-10.png','I-10.png','I-10.png'];
 let characterGraphicsJumping = ['J-31.png','J-31.png','J-32.png','J-32.png','J-33.png','J-33.png','J-34.png','J-34.png','J-35.png','J-35.png','J-36.png','J-36.png','J-37.png','J-37.png','J-38.png','J-38.png','J-39.png','J-39.png'];
+let characterGraphicsSleeping = ['I-11.png','I-11.png','I-11.png','I-12.png','I-12.png','I-12.png','I-13.png','I-13.png','I-13.png','I-14.png','I-14.png','I-14.png','I-15.png','I-15.png','I-15.png','I-16.png','I-16.png','I-16.png','I-17.png','I-17.png','I-17.png','I-18.png','I-18.png','I-18.png','I-19.png','I-19.png','I-19.png', 'I-20.png', 'I-20.png', 'I-20.png'];
+let characterGraphicsWounded = ['H-41.png', 'H-41.png', 'H-41.png', 'H-42.png', 'H-42.png', 'H-42.png', 'H-43.png', 'H-43.png', 'H-43.png'];
+let characterGraphicsDead = ['D-51.png','D-51.png','D-51.png','D-52.png','D-52.png','D-52.png','D-53.png','D-53.png','D-53.png','D-54.png','D-54.png','D-54.png','D-55.png','D-55.png','D-55.png','D-56.png','D-56.png', 'D-56.png','D-57.png','D-57.png','D-57.png'];
 let characterGraphicIndex = 0;
 let cloudOffset = 0;
 let chickenGraphics = ['1.Paso_derecho.png','1.Paso_derecho.png','1.Paso_derecho.png', '2.Centro.png', '2.Centro.png', '2.Centro.png', '3.Paso_izquierdo.png', '3.Paso_izquierdo.png', '3.Paso_izquierdo.png' ];
@@ -14,10 +17,11 @@ let bottleGraphicsRotating = ['botella_rotación1.png','botella_rotación1.png',
 let bossGraphicsWalking = ['G1.png', 'G1.png', 'G1.png', 'G2.png','G2.png','G2.png', 'G3.png', 'G3.png', 'G3.png', 'G4.png', 'G4.png', 'G4.png' ];
 let bossGraphicsAngry = ['G5.png','G5.png','G5.png', 'G6.png', 'G6.png', 'G6.png', 'G7.png', 'G7.png', 'G7.png', 'G8.png', 'G8.png', 'G8.png', 'G9.png', 'G9.png', 'G9.png', 'G10.png', 'G10.png', 'G10.png', 'G11.png','G11.png','G11.png', 'G12.png', 'G12.png', 'G12.png' ];
 let bossGraphicsAttacking = ['G13.png','G13.png','G13.png', 'G14.png', 'G14.png', 'G14.png', 'G15.png', 'G15.png', 'G15.png', 'G16.png', 'G16.png', 'G16.png', 'G17.png', 'G17.png', 'G17.png', 'G18.png', 'G18.png', 'G18.png', 'G19.png','G19.png','G19.png', 'G20.png', 'G20.png', 'G20.png'];
+let bossGraphicsWounded = ['G21.png', 'G21.png', 'G21.png','G22.png', 'G22.png', 'G22.png','G23.png', 'G23.png', 'G23.png'];
 let bossGraphicsDead = ['G24.png','G24.png','G24.png','G25.png','G25.png','G25.png','G26.png','G26.png','G26.png'];
 let currentBossIndex = 0;
-let allImgArrays = [characterGraphicsMoving, characterGraphicsStanding, characterGraphicsJumping, chickenGraphics, chickenGraphics, bossGraphicsWalking, bossGraphicsAngry, bossGraphicsAttacking];
-let allImgArraysPaths = ['./img/2.Secuencias_Personaje-Pepe-corrección/2.Secuencia_caminata/', './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/IDLE/', './img/2.Secuencias_Personaje-Pepe-corrección/3.Secuencia_salto/', './img/3.Secuencias_Enemy_básico/Versión_Gallinita/', './img/3.Secuencias_Enemy_básico/Versión_pollito/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/1.Caminata/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/1.Alerta/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/2.Ataque/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/4.Muerte/' ];
+let allImgArrays = [characterGraphicsMoving, characterGraphicsStanding, characterGraphicsJumping, characterGraphicsSleeping, characterGraphicsWounded, characterGraphicsDead, chickenGraphics, chickenGraphics, bossGraphicsWalking, bossGraphicsAngry, bossGraphicsAttacking, bossGraphicsWounded, bossGraphicsDead];
+let allImgArraysPaths = ['./img/2.Secuencias_Personaje-Pepe-corrección/2.Secuencia_caminata/', './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/IDLE/', './img/2.Secuencias_Personaje-Pepe-corrección/3.Secuencia_salto/', './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/LONG_IDLE/', './img/2.Secuencias_Personaje-Pepe-corrección/4.Herido/' ,'./img/2.Secuencias_Personaje-Pepe-corrección/5.Muerte/' ,'./img/3.Secuencias_Enemy_básico/Versión_Gallinita/', './img/3.Secuencias_Enemy_básico/Versión_pollito/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/1.Caminata/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/1.Alerta/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/2.Ataque/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/3.Herida/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/4.Muerte/' ];
 let bottle_base_image = new Image();
 
 let images = []; // check if this array is needed
@@ -25,8 +29,7 @@ let images = []; // check if this array is needed
 function draw() {
     setInterval(function() {
        drawBackground();
-       drawEnergyBar();
-       drawBottleBar();
+       drawBars();
        updateCharacter();
        drawChicken();
        drawBottles();
@@ -58,17 +61,31 @@ function draw() {
  * Draw bottle and energy bars
  */
 
-    function drawEnergyBar() {
-        // draws energy bar for main character
-        let energyBarPath = './img/7.Marcadores/Barra/Marcador vida/azul/' + character_energy + '_.png';
-        addBackgroundObject( energyBarPath, 730 - bg_elements, 100, 0.3, 0.15, 0,6); 
-        
-        // draws energy bar for final boss enemy
-        let energyBarPathBoss = './img/7.Marcadores/Barra/Marcador vida/naranja/' + boss_energy + '_.png';
-        addBackgroundObject( energyBarPathBoss, 1050, 150, 0.2, 0.10, 0,6);
+    function drawBars() {
+        drawCharacterEnergyBar();
+        drawBossEnergyBar();  
+        drawBottleBar();
     }
 
-    function drawBottleBar() {
+    function drawCharacterEnergyBar() {
+        // draws energy bar for main character
+        let energyBarPath = './img/7.Marcadores/Barra/Marcador vida/azul/' + character_energy + '_.png';
+        if (character_energy <=0) {
+            energyBarPath = './img/7.Marcadores/Barra/Marcador vida/azul/0_.png';
+        }
+        addBackgroundObject( energyBarPath, 730 - bg_elements, 100, 0.3, 0.15, 0,6); 
+     }
+
+     function drawBossEnergyBar() {
+        // draws energy bar for final boss enemy
+        let energyBarPathBoss = './img/7.Marcadores/Barra/Marcador vida/naranja/' + boss_energy + '_.png';
+        if (boss_energy <=0) {
+            energyBarPathBoss = './img/7.Marcadores/Barra/Marcador vida/naranja/0_.png';
+        }
+        addBackgroundObject( energyBarPathBoss, 1050, 150, 0.2, 0.10, 0,6);
+     }
+
+     function drawBottleBar() {
         let bottleBarPath = './img/7.Marcadores/Barra/Marcador_botella/Azul/' + collectedBottles + '_.png';
         addBackgroundObject( bottleBarPath, 25 - bg_elements, 100, 0.3, 0.15, 0,6);
      }
@@ -89,9 +106,12 @@ function draw() {
         } else if (boss_energy == 80) {
             index = currentBossIndex % bossGraphicsAngry.length;
             bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/1.Alerta/' + bossGraphicsAngry[index];
-        } else if (boss_energy < 80) {
+        } else if (boss_energy <= 80 && boss_energy > 20) {
             index = currentBossIndex % bossGraphicsAttacking.length;
             bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/2.Ataque/' + bossGraphicsAttacking[index];
+        } else if (boss_energy == 20) {
+            index = currentBossIndex % bossGraphicsWounded.length;
+            bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/3.Herida/' + bossGraphicsWounded[index];
         } else if (boss_energy <= 0) {
             index = currentBossIndex % bossGraphicsDead.length;
             bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/4.Muerte/' + bossGraphicsDead[index];
@@ -255,6 +275,31 @@ function draw() {
             let index = characterGraphicIndex % characterGraphicsStanding.length;
             currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/IDLE/' + characterGraphicsStanding[index];
         }    
+    }
+
+    function animateSleepingCharacter(isJumping) {
+        //changes graphics for sleeping character (after inactivity)
+        if (isSleeping && !isMovingLeft && !isMovingRight && !isJumping) {
+            let index = characterGraphicIndex % characterGraphicsSleeping.length;
+            currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/LONG_IDLE/' + characterGraphicsSleeping[index];
+        }
+    }
+
+    function animateWoundedCharacter() {
+        // Change graphics for wounded character
+        if (isWounded) {
+            let index = characterGraphicIndex % characterGraphicsWounded.length;
+            currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/4.Herido/' + characterGraphicsWounded[index];
+        }    
+
+    }
+
+    function animateDeadCharacter() {
+        // changes graphics when character dies
+        if (character_energy <= 0) {
+            let index = characterGraphicIndex % characterGraphicsDead.length;
+            currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/5.Muerte/' + characterGraphicsDead[index];
+        }
     }
 
 /**
