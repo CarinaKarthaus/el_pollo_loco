@@ -12,6 +12,8 @@
  let isMovingRight = false;
  let isMovingLeft = false;
  let isSleeping = false;
+ let isWounded = false;
+ let isDead = false;
  let bg_elements = 0;
  let timePassedSinceJump = 0; 
  let lastJumpStarted = 0;
@@ -61,42 +63,50 @@
             checkChickenCollision();
             checkBottleCollision();
             checkBossCollision();
-        }, 100);
+        }, 200);
     }
 
     function checkBossCollision() {
-        if ( checkCollisionCondition(thrownBottleX, 30, boss_x, 600, thrownBottleY, 50, boss_y)) {
+        if ( checkCollisionCondition(thrownBottleX, 60, boss_x + bg_elements, 300, thrownBottleY, 60, boss_y, 350)) {
             if (boss_energy > 0) {
                 boss_energy -= COLLISION_ENERGY_LOSS;
-                console.log('boss_energy: ' + boss_energy)    
+                console.log('boss_energy: ' + boss_energy);    
             } else {
                 console.log('Congrats, you won!');
             }
         }
     } 
 
-    function checkCollisionCondition(collider_1_x, collider_1_width, collider_2_x, collider_2_width, collider_2_y, collider_2_height, collider_1_y) {
-        collider_1_x += bg_elements; // add movement of background
+    function checkCollisionCondition(collider_1_x, collider_1_width, collider_2_x, collider_2_width, collider_1_y, collider_1_height, collider_2_y, collider_2_height) {
+        //collider_2_x += bg_elements; // add movement of background
         // defines range for x-position in which collision is detected
-        let x_condition = ((collider_1_x - collider_1_width/2) < (collider_2_x + collider_2_width/2) && (collider_1_x + collider_1_width/2) > (collider_2_x + collider_2_width/2));
+        let x_condition = ((collider_1_x - collider_1_width/2) < (collider_2_x + collider_2_width/2) && (collider_1_x + collider_1_width/2) > (collider_2_x - collider_2_width/2));
         // defines range for y-position in which collision is detected
-        let y_condition = ((collider_2_y + collider_2_height) > collider_1_y) ;
+        let y_condition = ((collider_1_y + collider_1_height) > collider_2_y) && (collider_1_y < (collider_2_y + collider_2_height)) ;
         return (x_condition && y_condition);
     }
 
     function checkChickenCollision() {
         timeSinceLastCollision = new Date().getTime() - timeOfCollision;
+        if (timeSinceLastCollision > 1000) {    // wounded state lasts 1000ms (>> prevents jumping and triggers wounded-animation)
+            isWounded = false;
+        }
         for (let i = 0; i < chickens.length; i++) {
             let chicken = chickens[i];
             let chickenWidth = canvas.width * chicken.scale_x; 
-            let chicken_x = chicken.position_x;  // calculates absolute position of chicken by taking background-movement into account
-            characterWidth = character_image.width * 0.35 - 75;
-            
+            let chicken_x = chicken.position_x + bg_elements;  // calculates absolute position of chicken by taking background-movement into account
+            characterWidth = character_image.width * 0.35 - 60;
+
+            console.log('Chicken Position y: ' + chicken.position_y);
+            console.log('character_y' + character_y + ' character_height: ' + characterHeight);
             // Character energy reduced if he collides with enemy AND enough time has passed since last collision
-            if (timeSinceLastCollision > 750 && checkCollisionCondition(chicken_x, chickenWidth, character_x, characterWidth, character_y, characterHeight, chicken.position_y)) {        
+            if (timeSinceLastCollision > 750 && checkCollisionCondition( character_x, characterWidth, chicken_x, chickenWidth, character_y, characterHeight, chicken.position_y, 50)) {        
                 timeOfCollision = new Date().getTime();
                 reduceCharacterEnergy();
+                isWounded = true;
             }
+            
+
         }
     }
 
@@ -104,7 +114,8 @@
         character_energy -= COLLISION_ENERGY_LOSS;  // reduce energy when hit by enemy
         
         if (character_energy <= 0) {
-            alert('Game over!');    // game over if character energy
+            //alert('Game over!');    // game over if character energy
+            isDead = true;
             AUDIO_RUNNING.pause(); // pauses running audio when game over
         }
     }
@@ -113,9 +124,9 @@
         // check collision to pick-up bottle
         for (let i = 0; i < placedBottles.length; i++) {
            let bottleWidth = (canvas.width * 0.125); 
-           let bottle_x = placedBottles[i];  
+           let bottle_x = placedBottles[i] + bg_elements;  
    
-           if (checkCollisionCondition(bottle_x, bottleWidth, character_x, (characterWidth -75), character_y, characterHeight, bottle_y)) { 
+           if (checkCollisionCondition(bottle_x, bottleWidth, character_x, (characterWidth -75), character_y, characterHeight, bottle_y, 100 )) { 
                pickBottle(i);
            }; 
        };
@@ -198,12 +209,14 @@
     }
 
     function animateCharacter() {
-        let isJumping = timePassedSinceJump < JUMP_TIME * 2;
+        let isJumping = (timePassedSinceJump < JUMP_TIME * 2) && !isWounded;
         // Check conditions for character-movements and animate if true
         animateRunningCharacter();
         animateJumpingCharacter(isJumping);
         animateStandingCharacter(isJumping);
         animateSleepingCharacter(isJumping);
+        animateWoundedCharacter();
+        animateDeadCharacter();
         if (!isMovingLeft && !isMovingRight || isJumping) {
             AUDIO_RUNNING.pause(); // pauses running audio when standing or jumping
         }
@@ -224,19 +237,14 @@
  */
 
     function listenForKeys() {
-        if (character_energy <= 0) {
-            alert('Game over!');
-        } else {
             document.addEventListener("keydown", e => {
                 const k = e.key;
-         
                 checkKeydown(k, e);
                 saveKeydownTime(k, e); 
-                preventDoubleJumping(e); 
-                initiateBottleThrow(k);           
+                preventJumping(e); 
+                initiateBottleThrow(k);     
             }); 
-            checkKeyup();    
-        }
+            checkKeyup(); 
     }
 
     function saveKeydownTime(k, e) {
@@ -257,13 +265,12 @@
             characterGraphicIndex = 0;
             AUDIO_JUMP.play();
         }
-
     }
 
-    function preventDoubleJumping(e) {
-        // prevent double-jumping
+    function preventJumping(e) {
+        // prevent double-jumping or jumping when character is wounded
         timePassedSinceJump = new Date().getTime() - lastJumpStarted;
-        if (e.code == 'Space' && timePassedSinceJump > JUMP_TIME * 2) { 
+        if (e.code == 'Space' && timePassedSinceJump > JUMP_TIME * 2 && !isWounded) { 
             lastJumpStarted = new Date().getTime();
         } 
     }

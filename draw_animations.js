@@ -141,7 +141,9 @@ function draw() {
     }
 
     function drawGround() {
-        calculateBgMovement();
+        if (!isDead) {
+            calculateBgMovement();
+        }
         drawFond();
     }
 
@@ -265,8 +267,8 @@ function draw() {
     function animateJumpingCharacter(isJumping) {
         // Change graphics for jumping character
         if (isJumping) { // Pepe is jumping
-        let index = characterGraphicIndex % characterGraphicsJumping.length;
-        currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/3.Secuencia_salto/' + characterGraphicsJumping[index];
+            let index = characterGraphicIndex % characterGraphicsJumping.length;
+            currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/3.Secuencia_salto/' + characterGraphicsJumping[index];
         }
     }
     function animateStandingCharacter(isJumping) {
@@ -296,7 +298,7 @@ function draw() {
 
     function animateDeadCharacter() {
         // changes graphics when character dies
-        if (character_energy <= 0) {
+        if (isDead) {
             let index = characterGraphicIndex % characterGraphicsDead.length;
             currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/5.Muerte/' + characterGraphicsDead[index];
         }
