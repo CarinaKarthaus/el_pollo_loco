@@ -20,6 +20,7 @@ let bossGraphicsAttacking = ['G13.png','G13.png','G13.png', 'G14.png', 'G14.png'
 let bossGraphicsWounded = ['G21.png', 'G21.png', 'G21.png','G22.png', 'G22.png', 'G22.png','G23.png', 'G23.png', 'G23.png'];
 let bossGraphicsDead = ['G24.png','G24.png','G24.png','G25.png','G25.png','G25.png','G26.png','G26.png','G26.png'];
 let currentBossIndex = 0;
+let bossImgPath;
 let allImgArrays = [characterGraphicsMoving, characterGraphicsStanding, characterGraphicsJumping, characterGraphicsSleeping, characterGraphicsWounded, characterGraphicsDead, chickenGraphics, chickenGraphics, bossGraphicsWalking, bossGraphicsAngry, bossGraphicsAttacking, bossGraphicsWounded, bossGraphicsDead];
 let allImgArraysPaths = ['./img/2.Secuencias_Personaje-Pepe-corrección/2.Secuencia_caminata/', './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/IDLE/', './img/2.Secuencias_Personaje-Pepe-corrección/3.Secuencia_salto/', './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/LONG_IDLE/', './img/2.Secuencias_Personaje-Pepe-corrección/4.Herido/' ,'./img/2.Secuencias_Personaje-Pepe-corrección/5.Muerte/' ,'./img/3.Secuencias_Enemy_básico/Versión_Gallinita/', './img/3.Secuencias_Enemy_básico/Versión_pollito/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/1.Caminata/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/1.Alerta/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/2.Ataque/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/3.Herida/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/4.Muerte/' ];
 let bottle_base_image = new Image();
@@ -96,10 +97,15 @@ function draw() {
  */
 
     function drawFinalBoss() {
-        //setInterval(function() { 
         let index;
-        let bossImgPath;
-        // Change boss-movement when he gets attacked
+
+        checkBossEnergy(index);
+        addBackgroundObject(bossImgPath, boss_x, boss_y, 0.4 , 0.9);
+        currentBossIndex++;            
+    }
+
+    function checkBossEnergy(index){
+        // Change boss-graphics and sounds depending on energy-level
         if (boss_energy == 100) {
             index = currentBossIndex % bossGraphicsWalking.length;
             bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/1.Caminata/' + bossGraphicsWalking[index];
@@ -109,18 +115,23 @@ function draw() {
         } else if (boss_energy <= 80 && boss_energy > 20) {
             index = currentBossIndex % bossGraphicsAttacking.length;
             bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/2.Ataque/' + bossGraphicsAttacking[index];
+            AUDIO_CHICKEN.play();
         } else if (boss_energy == 20) {
             index = currentBossIndex % bossGraphicsWounded.length;
             bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/3.Herida/' + bossGraphicsWounded[index];
-        } else if (boss_energy <= 0) {
+        } 
+        animateBossDefeat(index);
+    }
+    function animateBossDefeat(index) {
+        if (bossDefeatedAt > 0) {
+            let timePassed = new Date().getTime() - bossDefeatedAt;
+            boss_x += timePassed / 20;
+            boss_y -= timePassed / 10;
             index = currentBossIndex % bossGraphicsDead.length;
             bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/4.Muerte/' + bossGraphicsDead[index];
         }
-           
-        addBackgroundObject(bossImgPath, boss_x, boss_y, 0.4 , 0.9);
-        currentBossIndex++;            
-        //} , 50); 
     }
+
     function drawChicken() {
         for (let k = 0; k < chickens.length; k++) {
             let index = currentChickenIndex % chickenGraphics.length;
@@ -293,12 +304,13 @@ function draw() {
             let index = characterGraphicIndex % characterGraphicsWounded.length;
             currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/4.Herido/' + characterGraphicsWounded[index];
         }    
-
     }
 
     function animateDeadCharacter() {
         // changes graphics when character dies
         if (isDead) {
+            let timePassed = new Date().getTime() - characterDefeatedAt;
+            character_x -= timePassed / 20;
             let index = characterGraphicIndex % characterGraphicsDead.length;
             currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/5.Muerte/' + characterGraphicsDead[index];
         }

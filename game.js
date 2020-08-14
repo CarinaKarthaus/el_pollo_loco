@@ -30,6 +30,8 @@
  let timeSinceLastKeydown = 0;
  let timeSinceLastCollision = 4000;
  let timeOfCollision = 0;
+ let bossDefeatedAt = 0;
+ let characterDefeatedAt = 0;
 
 
  // ----------- Game config
@@ -38,6 +40,13 @@
  let AUDIO_RUNNING = new Audio ('./audio/running.mp3');
  let AUDIO_JUMP = new Audio ('./audio/jump.mp3');
  let AUDIO_BOTTLE = new Audio ('./audio/bottle.mp3');
+ let AUDIO_THROW = new Audio ('./audio/throw.mp3');
+ let AUDIO_CHICKEN = new Audio ('./audio/chicken.mp3');
+ let AUDIO_BREAKING_BOTTLE = new Audio ('./audio/breaking_bottle.mp3');
+ let AUDIO_BACKGROUND_MUSIC = new Audio ('./audio/background_music.mp3');
+ AUDIO_BACKGROUND_MUSIC.loop = true;
+ AUDIO_BACKGROUND_MUSIC.volume = 0.2;
+
  let COLLISION_ENERGY_LOSS = 20;
  let COLLISION_BOTTLE_FILL = 20;
 
@@ -67,12 +76,15 @@
     }
 
     function checkBossCollision() {
-        if ( checkCollisionCondition(thrownBottleX, 60, boss_x + bg_elements, 300, thrownBottleY, 60, boss_y, 350)) {
+        if ( checkCollisionCondition(thrownBottleX, 80, boss_x + bg_elements, 350, thrownBottleY, 65, boss_y, 400)) {
+            AUDIO_BREAKING_BOTTLE.play();
             if (boss_energy > 0) {
                 boss_energy -= COLLISION_ENERGY_LOSS;
                 console.log('boss_energy: ' + boss_energy);    
-            } else {
+            } 
+            if (boss_energy <= 0) {
                 console.log('Congrats, you won!');
+                bossDefeatedAt = new Date().getTime();
             }
         }
     } 
@@ -97,16 +109,12 @@
             let chicken_x = chicken.position_x + bg_elements;  // calculates absolute position of chicken by taking background-movement into account
             characterWidth = character_image.width * 0.35 - 60;
 
-            console.log('Chicken Position y: ' + chicken.position_y);
-            console.log('character_y' + character_y + ' character_height: ' + characterHeight);
             // Character energy reduced if he collides with enemy AND enough time has passed since last collision
-            if (timeSinceLastCollision > 750 && checkCollisionCondition( character_x, characterWidth, chicken_x, chickenWidth, character_y, characterHeight, chicken.position_y, 50)) {        
+            if (timeSinceLastCollision > 1000 && checkCollisionCondition( character_x, characterWidth, chicken_x, chickenWidth, character_y, characterHeight, chicken.position_y, 50)) {        
                 timeOfCollision = new Date().getTime();
                 reduceCharacterEnergy();
                 isWounded = true;
             }
-            
-
         }
     }
 
@@ -116,6 +124,7 @@
         if (character_energy <= 0) {
             //alert('Game over!');    // game over if character energy
             isDead = true;
+            characterDefeatedAt = new Date().getTime();
             AUDIO_RUNNING.pause(); // pauses running audio when game over
         }
     }
@@ -177,7 +186,6 @@
         }, 100);
     }
 
-
  /**
   * Create and calculate character 
   */
@@ -191,10 +199,8 @@
     function checkCharacterMovement() {  
         setInterval(function() {
             timePassedSinceJump = new Date().getTime() - lastJumpStarted;
-
             checkIfSleeping();
             animateCharacter();
-            
             characterGraphicIndex++;
         }, 50);
     }
@@ -235,7 +241,6 @@
 /**
  * Check player commands 
  */
-
     function listenForKeys() {
             document.addEventListener("keydown", e => {
                 const k = e.key;
@@ -278,7 +283,9 @@
     function initiateBottleThrow(k) {
         if (k == 'd' && collectedBottles > 0) {
             let timePassed = new Date().getTime() - bottleThrowTime;
+
             if (timePassed > 1000) {
+                AUDIO_THROW.play();
                 collectedBottles -= COLLISION_BOTTLE_FILL; 
                 bottleThrowTime = new Date().getTime();
             }
