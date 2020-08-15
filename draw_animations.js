@@ -29,16 +29,53 @@ let images = []; // check if this array is needed
 
 function draw() {
     setInterval(function() {
-       drawBackground();
-       drawBars();
-       updateCharacter();
-       drawChicken();
-       drawBottles();
-       drawBottleThrow();
-       drawFinalBoss();
+        drawBackground();
+        updateCharacter();
+        drawFinalBoss();
+        if (gameFinished || isDead) {
+            drawFinalScreens();
+        }
+         else {
+            drawSideElements();
+        }
     }, 50);
-
    //requestAnimationFrame(draw);
+}
+
+function drawSideElements() {
+    drawBars();
+    drawChicken();
+    drawBottles();
+    drawBottleThrow();
+}
+
+/**
+ * Draw final screens for win or defeat
+ */
+
+function drawFinalScreens() {
+    if (gameFinished) {
+        drawWinScreen();
+    } else if (isDead) {
+        drawDefeatScreen();
+    } 
+}
+
+function drawWinScreen() {
+    prepareNotification();
+    ctx.fillText('Congrats!', canvas.width/2, 200);
+    ctx.fillText(' You won!', canvas.width/2, 300 );
+}
+
+function drawDefeatScreen() {
+    prepareNotification();
+    ctx.fillText('Oh nooo!', canvas.width/2, 200);
+    ctx.fillText(' You lost!', canvas.width/2, 300 );
+}
+function prepareNotification() {
+    ctx.font = '90px Bradley Hand ITC';
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
 }
 
 /**
@@ -83,7 +120,7 @@ function draw() {
         if (boss_energy <=0) {
             energyBarPathBoss = './img/7.Marcadores/Barra/Marcador vida/naranja/0_.png';
         }
-        addBackgroundObject( energyBarPathBoss, 1050, 150, 0.2, 0.10, 0,6);
+        addBackgroundObject( energyBarPathBoss, BOSS_POSITION_X + 50, 150, 0.2, 0.10, 0,6);
      }
 
      function drawBottleBar() {
@@ -98,34 +135,44 @@ function draw() {
 
     function drawFinalBoss() {
         let index;
-
-        checkBossEnergy(index);
-        addBackgroundObject(bossImgPath, boss_x, boss_y, 0.4 , 0.9);
+        changeBossAnimations(index);
+        addBackgroundObject(bossImgPath, BOSS_POSITION_X, boss_y, 0.4 , 0.9);
         currentBossIndex++;            
     }
 
-    function checkBossEnergy(index){
-        // Change boss-graphics and sounds depending on energy-level
+    function changeBossAnimations(index){
+        // Change boss-graphics depending on energy-level
+        animateWalkingBoss(index);
+        animateAttackingBoss(index);
+        animateWoundedBoss(index);
+        animateBossDefeat(index);
+    }
+    
+    function animateWalkingBoss(index) {
         if (boss_energy == 100) {
             index = currentBossIndex % bossGraphicsWalking.length;
             bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/1.Caminata/' + bossGraphicsWalking[index];
-        } else if (boss_energy == 80) {
-            index = currentBossIndex % bossGraphicsAngry.length;
-            bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/1.Alerta/' + bossGraphicsAngry[index];
-        } else if (boss_energy <= 80 && boss_energy > 20) {
-            index = currentBossIndex % bossGraphicsAttacking.length;
-            bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/2.Ataque/' + bossGraphicsAttacking[index];
-            AUDIO_CHICKEN.play();
-        } else if (boss_energy == 20) {
+        } 
+    }
+    function animateWoundedBoss(index) {
+        if (bossIsWounded) {
             index = currentBossIndex % bossGraphicsWounded.length;
             bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/3.Herida/' + bossGraphicsWounded[index];
         } 
-        animateBossDefeat(index);
+    }
+    function animateAttackingBoss(index) {
+        if (boss_energy == 80) {
+            index = currentBossIndex % bossGraphicsAngry.length;
+            bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/1.Alerta/' + bossGraphicsAngry[index];
+        } else if (boss_energy <= 80 && boss_energy > 0) {
+            index = currentBossIndex % bossGraphicsAttacking.length;
+            bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/2.Ataque/' + bossGraphicsAttacking[index];
+        }
     }
     function animateBossDefeat(index) {
         if (bossDefeatedAt > 0) {
             let timePassed = new Date().getTime() - bossDefeatedAt;
-            boss_x += timePassed / 20;
+            BOSS_POSITION_X += timePassed / 20;
             boss_y -= timePassed / 10;
             index = currentBossIndex % bossGraphicsDead.length;
             bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/4.Muerte/' + bossGraphicsDead[index];
@@ -161,7 +208,7 @@ function draw() {
     function drawFond() {
         // creates background automatically 
         let currentFondIndex = 0;
-        for (let i=-1; i < 10; i++) {
+        for (let i=-1; i < LEVEL_LENGTH; i++) {
             let index = currentFondIndex % fondImg.length;
             addBackgroundObject('./img/5.Fondo/Capas/5.cielo_1920-1080px.png', i * canvas.width, 0, 1, 1.2);
             addBackgroundObject('./img/5.Fondo/Capas/3.Fondo3/' + fondImg[index], i * canvas.width, 0, 1, 1.2, 0.8);

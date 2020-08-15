@@ -13,18 +13,18 @@
  let isMovingLeft = false;
  let isSleeping = false;
  let isWounded = false;
+ let bossIsWounded = false;
  let isDead = false;
  let bg_elements = 0;
  let timePassedSinceJump = 0; 
  let lastJumpStarted = 0;
  let chickens = [];
- let placedBottles = [1560, 3070, 4500, 6800, 508, 7400];
+ let placedBottles = [508, 1560, 3070, 4500, 5800, 6400];
  let bottle_y = 430;
  let bottleThrowTime = 0;
  let thrownBottleX = 0;
  let thrownBottleY = 0;
  let boss_energy = 100;
- let boss_x = 1000;
  let boss_y = 130;
  let currentTime = new Date().getTime();
  let timeSinceLastKeydown = 0;
@@ -32,11 +32,15 @@
  let timeOfCollision = 0;
  let bossDefeatedAt = 0;
  let characterDefeatedAt = 0;
+ let timeSinceLastBottleCollision = 1000;
+ let timeOfBottleCollision; 
+ let gameFinished = false;
 
 
  // ----------- Game config
- let JUMP_TIME = 500; // in ms
- let GAME_SPEED = 12;
+ let LEVEL_LENGTH = 8; // indicates how often canvas-length is repeated (canvas-length = 1080px)
+ let JUMP_TIME = 450; // in ms
+ let GAME_SPEED = 18;
  let AUDIO_RUNNING = new Audio ('./audio/running.mp3');
  let AUDIO_JUMP = new Audio ('./audio/jump.mp3');
  let AUDIO_BOTTLE = new Audio ('./audio/bottle.mp3');
@@ -44,11 +48,16 @@
  let AUDIO_CHICKEN = new Audio ('./audio/chicken.mp3');
  let AUDIO_BREAKING_BOTTLE = new Audio ('./audio/breaking_bottle.mp3');
  let AUDIO_BACKGROUND_MUSIC = new Audio ('./audio/background_music.mp3');
- AUDIO_BACKGROUND_MUSIC.loop = true;
- AUDIO_BACKGROUND_MUSIC.volume = 0.2;
-
+ let AUDIO_WIN = new Audio ('./audio/win.mp3');
+ let AUDIO_PAIN = new Audio ('./audio/pain.mp3');
+ let AUDIO_LOST = new Audio ('./audio/defeat.mp3');
+ let BOSS_POSITION_X = 7000;
  let COLLISION_ENERGY_LOSS = 20;
  let COLLISION_BOTTLE_FILL = 20;
+ let DURATION_WOUNDED_STATE = 1000;
+
+ AUDIO_BACKGROUND_MUSIC.loop = true;
+ AUDIO_BACKGROUND_MUSIC.volume = 0.2;
 
  function init() {
     canvas = document.getElementById('canvas');
@@ -76,21 +85,39 @@
     }
 
     function checkBossCollision() {
-        if ( checkCollisionCondition(thrownBottleX, 80, boss_x + bg_elements, 350, thrownBottleY, 65, boss_y, 400)) {
+        timeSinceLastBottleCollision = new Date().getTime() - timeOfBottleCollision;
+        if (timeSinceLastBottleCollision > DURATION_WOUNDED_STATE) {
+            bossIsWounded = false;
+        }
+        if (checkCollisionCondition(thrownBottleX, 80, BOSS_POSITION_X + bg_elements, 350, thrownBottleY, 65, boss_y, 400)) {
+            timeOfBottleCollision = new Date().getTime();
             AUDIO_BREAKING_BOTTLE.play();
-            if (boss_energy > 0) {
-                boss_energy -= COLLISION_ENERGY_LOSS;
-                console.log('boss_energy: ' + boss_energy);    
-            } 
-            if (boss_energy <= 0) {
-                console.log('Congrats, you won!');
-                bossDefeatedAt = new Date().getTime();
-            }
+            reduceBossEnergy();
         }
     } 
 
+    function reduceBossEnergy() {
+        // Reduce boss energy and trigger wounded-animation
+        if (boss_energy > 0) {
+            boss_energy -= COLLISION_ENERGY_LOSS;
+            bossIsWounded = true;
+        } 
+        // Trigger levelFinish-Animation if boss energy <= 0
+        if (boss_energy <= 0 && bossDefeatedAt == 0) {
+            bossDefeatedAt = new Date().getTime();
+            finishLevel();
+        }
+    }
+
+    function finishLevel() {
+        AUDIO_CHICKEN.play();
+        setTimeout(function() {
+            AUDIO_WIN.play();
+        }, 1500);
+        gameFinished = true;
+    }
+
     function checkCollisionCondition(collider_1_x, collider_1_width, collider_2_x, collider_2_width, collider_1_y, collider_1_height, collider_2_y, collider_2_height) {
-        //collider_2_x += bg_elements; // add movement of background
         // defines range for x-position in which collision is detected
         let x_condition = ((collider_1_x - collider_1_width/2) < (collider_2_x + collider_2_width/2) && (collider_1_x + collider_1_width/2) > (collider_2_x - collider_2_width/2));
         // defines range for y-position in which collision is detected
@@ -100,7 +127,7 @@
 
     function checkChickenCollision() {
         timeSinceLastCollision = new Date().getTime() - timeOfCollision;
-        if (timeSinceLastCollision > 1000) {    // wounded state lasts 1000ms (>> prevents jumping and triggers wounded-animation)
+        if (timeSinceLastCollision > DURATION_WOUNDED_STATE) {    // wounded state lasts 1000ms (>> prevents jumping and triggers wounded-animation)
             isWounded = false;
         }
         for (let i = 0; i < chickens.length; i++) {
@@ -110,10 +137,11 @@
             characterWidth = character_image.width * 0.35 - 60;
 
             // Character energy reduced if he collides with enemy AND enough time has passed since last collision
-            if (timeSinceLastCollision > 1000 && checkCollisionCondition( character_x, characterWidth, chicken_x, chickenWidth, character_y, characterHeight, chicken.position_y, 50)) {        
+            if (timeSinceLastCollision > DURATION_WOUNDED_STATE && checkCollisionCondition( character_x, characterWidth, chicken_x, chickenWidth, character_y, characterHeight, chicken.position_y, 50)) {        
                 timeOfCollision = new Date().getTime();
                 reduceCharacterEnergy();
                 isWounded = true;
+                AUDIO_PAIN.play();
             }
         }
     }
@@ -126,6 +154,7 @@
             isDead = true;
             characterDefeatedAt = new Date().getTime();
             AUDIO_RUNNING.pause(); // pauses running audio when game over
+            AUDIO_LOST.play();
         }
     }
 
@@ -160,7 +189,7 @@
             'position_y':   430,
             'scale_x':      0.1,
             'scale_y':      0.2,
-            'speed':        (Math.random() * 5) // generates random speed between 1 and 5 px
+            'speed':        (Math.random() * 10) // generates random speed between 1 and 10 px
         }
     }
 
@@ -169,11 +198,15 @@
         let pollitoPath = './img/3.Secuencias_Enemy_básico/Versión_pollito/';
     
         chickens = [
-            createChicken(gallinitaPath, 2* canvas.width ),
             createChicken(pollitoPath, 1.8 * canvas.width), 
-            createChicken(gallinitaPath, 4.5* canvas.width ),
+            createChicken(gallinitaPath, 2* canvas.width ),
+            createChicken(gallinitaPath, 2.8 * canvas.width), 
             createChicken(pollitoPath, 3.3 * canvas.width), 
-            createChicken(pollitoPath, 5.6 * canvas.width)
+            createChicken(gallinitaPath, 4.5* canvas.width ),
+            createChicken(pollitoPath, 5.6 * canvas.width),   
+            createChicken(pollitoPath, 5 * canvas.width), 
+            createChicken(gallinitaPath, 6.5* canvas.width ),
+            createChicken(pollitoPath, 8 * canvas.width)
         ]
     }
 
