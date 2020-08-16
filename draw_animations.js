@@ -35,7 +35,7 @@ function draw() {
         if (gameFinished || isDead) {
             drawFinalScreens();
         }
-         else {
+         else if (gameStarted) {
             drawSideElements();
         }
     }, 50);
@@ -124,7 +124,12 @@ function prepareNotification() {
      }
 
      function drawBottleBar() {
-        let bottleBarPath = './img/7.Marcadores/Barra/Marcador_botella/Azul/' + collectedBottles + '_.png';
+         let bottleBarPath;
+        if (collectedBottles <= 100) {
+            bottleBarPath = './img/7.Marcadores/Barra/Marcador_botella/Azul/' + collectedBottles + '_.png';
+        } else {
+            bottleBarPath = './img/7.Marcadores/Barra/Marcador_botella/Azul/100_.png';
+        }
         addBackgroundObject( bottleBarPath, 25 - bg_elements, 100, 0.3, 0.15, 0,6);
      }
 

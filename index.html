@@ -1,20 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Pollo Loco</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
     <script src="draw_animations.js"></script>
     <script src="game.js"></script>
 
 </head>
+
 <body onload="init()">
-<h1>El Pollo Loco</h1>
+    <div>
+        <h1>El Pollo Loco</h1>
+    </div>
 
-<canvas id="canvas" width="1080" height="500"></canvas>
+    <div class="canvas-box">
+
+        <canvas id="canvas" width="1080" height="500"></canvas>
+
+    </div>
+
+    <div class="btn-box">
+            <button id="start-btn" class="btn btn-secondary" onclick="startGame()">Start!</button>
+            <button id="restart-btn" class="btn btn-secondary d-none"
+                onclick="window.location.reload()">Restart!</button>
+    </div>
 
 
-    
 </body>
+
 </html>
+
+
+<!--  -->

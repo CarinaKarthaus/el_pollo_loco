@@ -35,6 +35,7 @@
  let timeSinceLastBottleCollision = 1000;
  let timeOfBottleCollision; 
  let gameFinished = false;
+ let gameStarted = false;
 
 
  // ----------- Game config
@@ -57,18 +58,33 @@
  let DURATION_WOUNDED_STATE = 1000;
 
  AUDIO_BACKGROUND_MUSIC.loop = true;
- AUDIO_BACKGROUND_MUSIC.volume = 0.2;
+ AUDIO_BACKGROUND_MUSIC.volume = 0.5;
 
  function init() {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
     
     preloadImages();
-    createChickenList();
-    calculateDrawingDetails();
     draw();
-    listenForKeys();
-    checkForCollision();
+    console.log(gameStarted);
+    runGameLogic();
+ }
+
+ function startGame() {
+    gameStarted = true;
+    AUDIO_BACKGROUND_MUSIC.play();
+    runGameLogic();
+ }
+
+ function runGameLogic() {
+    if (gameStarted) {
+        createChickenList();
+        calculateDrawingDetails();
+        listenForKeys();
+        checkForCollision();
+        document.getElementById('restart-btn').classList.remove('d-none'); // makes restart btn visible
+        document.getElementById('start-btn').classList.add('d-none'); // hides start-btn 
+    } 
  }
 
 
@@ -82,6 +98,7 @@
             checkBottleCollision();
             checkBossCollision();
         }, 200);
+
     }
 
     function checkBossCollision() {
@@ -111,10 +128,14 @@
 
     function finishLevel() {
         AUDIO_CHICKEN.play();
+        AUDIO_BACKGROUND_MUSIC.pause();
         setTimeout(function() {
             AUDIO_WIN.play();
         }, 1500);
         gameFinished = true;
+        gameStarted = false;
+        init();
+       
     }
 
     function checkCollisionCondition(collider_1_x, collider_1_width, collider_2_x, collider_2_width, collider_1_y, collider_1_height, collider_2_y, collider_2_height) {
@@ -127,7 +148,7 @@
 
     function checkChickenCollision() {
         timeSinceLastCollision = new Date().getTime() - timeOfCollision;
-        if (timeSinceLastCollision > DURATION_WOUNDED_STATE) {    // wounded state lasts 1000ms (>> prevents jumping and triggers wounded-animation)
+        if (timeSinceLastCollision > DURATION_WOUNDED_STATE) {    // wounded state prevents from jumping and triggers wounded-animation
             isWounded = false;
         }
         for (let i = 0; i < chickens.length; i++) {
@@ -150,9 +171,9 @@
         character_energy -= COLLISION_ENERGY_LOSS;  // reduce energy when hit by enemy
         
         if (character_energy <= 0) {
-            //alert('Game over!');    // game over if character energy
             isDead = true;
             characterDefeatedAt = new Date().getTime();
+            AUDIO_BACKGROUND_MUSIC.pause();
             AUDIO_RUNNING.pause(); // pauses running audio when game over
             AUDIO_LOST.play();
         }
@@ -187,7 +208,7 @@
             'img_path':     imgPath,
             'position_x':   position_x,
             'position_y':   430,
-            'scale_x':      0.1,
+            'scale_x':      0.09,
             'scale_y':      0.2,
             'speed':        (Math.random() * 10) // generates random speed between 1 and 10 px
         }
@@ -202,7 +223,6 @@
             createChicken(gallinitaPath, 2* canvas.width ),
             createChicken(gallinitaPath, 2.8 * canvas.width), 
             createChicken(pollitoPath, 3.3 * canvas.width), 
-            createChicken(gallinitaPath, 4.5* canvas.width ),
             createChicken(pollitoPath, 5.6 * canvas.width),   
             createChicken(pollitoPath, 5 * canvas.width), 
             createChicken(gallinitaPath, 6.5* canvas.width ),
