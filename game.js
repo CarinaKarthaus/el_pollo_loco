@@ -25,7 +25,7 @@
  let thrownBottleX = 0;
  let thrownBottleY = 0;
  let boss_energy = 100;
- let boss_y = 130;
+
  let currentTime = new Date().getTime();
  let timeSinceLastKeydown = 0;
  let timeSinceLastCollision = 4000;
@@ -36,6 +36,8 @@
  let timeOfBottleCollision; 
  let gameFinished = false;
  let gameStarted = false;
+ let bossAttack = false;
+ let bossTurning = false;
 
 
  // ----------- Game config
@@ -53,6 +55,9 @@
  let AUDIO_PAIN = new Audio ('./audio/pain.mp3');
  let AUDIO_LOST = new Audio ('./audio/defeat.mp3');
  let BOSS_POSITION_X = 7000;
+ let BOSS_POSITION_Y = 130;
+ let BOSS_WIDTH = 350;
+ let BOSS_HEIGHT = 400;
  let COLLISION_ENERGY_LOSS = 20;
  let COLLISION_BOTTLE_FILL = 20;
  let DURATION_WOUNDED_STATE = 1000;
@@ -96,22 +101,31 @@
         setInterval(function(){
             checkChickenCollision();
             checkBottleCollision();
+            checkBossBottleCollision();
             checkBossCollision();
         }, 200);
 
     }
 
-    function checkBossCollision() {
+    function checkBossBottleCollision() {
         timeSinceLastBottleCollision = new Date().getTime() - timeOfBottleCollision;
         if (timeSinceLastBottleCollision > DURATION_WOUNDED_STATE) {
             bossIsWounded = false;
         }
-        if (checkCollisionCondition(thrownBottleX, 80, BOSS_POSITION_X + bg_elements, 350, thrownBottleY, 65, boss_y, 400)) {
+        if (checkCollisionCondition(thrownBottleX, 80, BOSS_POSITION_X + bg_elements, BOSS_WIDTH, thrownBottleY, 65, BOSS_POSITION_Y, BOSS_HEIGHT)) {
             timeOfBottleCollision = new Date().getTime();
             AUDIO_BREAKING_BOTTLE.play();
             reduceBossEnergy();
         }
     } 
+    function checkBossCollision() {
+        // Character energy reduced if he collides with enemy AND enough time has passed since last collision
+        if (checkCollisionCondition( character_x, characterWidth, BOSS_POSITION_X + bg_elements, BOSS_WIDTH , character_y, characterHeight, BOSS_POSITION_Y, BOSS_HEIGHT)) {        
+            reduceCharacterEnergy();
+            bossAttack = true;
+            AUDIO_PAIN.play();
+        }
+    }
 
     function reduceBossEnergy() {
         // Reduce boss energy and trigger wounded-animation
@@ -135,7 +149,6 @@
         gameFinished = true;
         gameStarted = false;
         init();
-       
     }
 
     function checkCollisionCondition(collider_1_x, collider_1_width, collider_2_x, collider_2_width, collider_1_y, collider_1_height, collider_2_y, collider_2_height) {
@@ -169,7 +182,9 @@
 
     function reduceCharacterEnergy() {
         character_energy -= COLLISION_ENERGY_LOSS;  // reduce energy when hit by enemy
-        
+        if (bossAttack) {       
+            character_energy == 0;  // immediate death when character collides with boss
+        }        
         if (character_energy <= 0) {
             isDead = true;
             characterDefeatedAt = new Date().getTime();
@@ -231,10 +246,43 @@
     }
 
     function calculateChickenPosition() {
-        setInterval( function() {
+        let updateChickenInterval = setInterval( function() {
             for (let i=0; i < chickens.length; i++) {
                 let chicken = chickens[i];
                 chicken.position_x -= chicken.speed; 
+            }
+        }, 100);
+
+        // updateIntervals.push(updateChickenInterval); // Keep here
+
+        // Move to game over function
+        //updateIntervals.forEach((interval) => {
+        //    clearInterval(interval)
+        // });
+        
+        // updateIntervals = [];
+
+    }
+
+    function calculateBossPosition() {
+
+        setInterval(function(){
+            console.log(BOSS_POSITION_X, (6600 + bg_elements), bossTurning);
+        }, 2000);
+
+        setInterval( function() {
+            if (boss_energy == 100)  {
+                if (BOSS_POSITION_X > (6600) && !bossTurning) {
+                    BOSS_POSITION_X -= 5;
+                } else if (BOSS_POSITION_X <= (6600)) {
+                    bossTurning = true;
+                    BOSS_POSITION_X += 5;  
+                } // else if (BOSS_POSITION_X >= (7000)) {
+                //     bossTurning = false;
+                // }   
+            } 
+            else if (boss_energy < 100) {
+                BOSS_POSITION_X -= 8;
             }
         }, 100);
     }
@@ -247,6 +295,7 @@
         calculateCloudOffset();
         calculateChickenPosition();
         calculateBottleThrow();
+        calculateBossPosition();
     }
 
     function checkCharacterMovement() {  

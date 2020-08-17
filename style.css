@@ -13,7 +13,13 @@ h1 {
     font-size: 3rem;
     font-weight: bold;
     margin: 0.5rem 0;
+    background-color: rgb(150, 40, 40);
+    padding: 0.5vh 3vw;
+    text-align: center;
+    color: white;
 }
+
+
 
 .canvas-box {
     background:
