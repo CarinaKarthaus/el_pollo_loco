@@ -25,7 +25,6 @@
  let thrownBottleX = 0;
  let thrownBottleY = 0;
  let boss_energy = 100;
-
  let currentTime = new Date().getTime();
  let timeSinceLastKeydown = 0;
  let timeSinceLastCollision = 4000;
@@ -38,6 +37,8 @@
  let gameStarted = false;
  let bossAttack = false;
  let bossTurning = false;
+ let updateIntervals = []; // array of interval-functions that are carried out
+ let isJumping = false;
 
 
  // ----------- Game config
@@ -60,7 +61,7 @@
  let BOSS_HEIGHT = 400;
  let COLLISION_ENERGY_LOSS = 20;
  let COLLISION_BOTTLE_FILL = 20;
- let DURATION_WOUNDED_STATE = 1000;
+ let DURATION_WOUNDED_STATE = 800;
 
  AUDIO_BACKGROUND_MUSIC.loop = true;
  AUDIO_BACKGROUND_MUSIC.volume = 0.5;
@@ -68,13 +69,9 @@
  function init() {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
-    
     preloadImages();
     draw();
-    console.log(gameStarted);
-    runGameLogic();
  }
-
  function startGame() {
     gameStarted = true;
     AUDIO_BACKGROUND_MUSIC.play();
@@ -82,29 +79,27 @@
  }
 
  function runGameLogic() {
-    if (gameStarted) {
-        createChickenList();
-        calculateDrawingDetails();
-        listenForKeys();
-        checkForCollision();
-        document.getElementById('restart-btn').classList.remove('d-none'); // makes restart btn visible
-        document.getElementById('start-btn').classList.add('d-none'); // hides start-btn 
-    } 
+    createChickenList();
+    calculateDrawingDetails();
+    listenForKeys();
+    checkForCollision();
+    document.getElementById('restart-btn').classList.remove('d-none'); // makes restart btn visible
+    document.getElementById('start-btn').classList.add('d-none'); // hides start-btn 
  }
-
 
  /**
   * Check for collisions
   */
 
     function checkForCollision() {
-        setInterval(function(){
+        let updateCollisionInterval = setInterval(function(){
             checkChickenCollision();
             checkBottleCollision();
             checkBossBottleCollision();
             checkBossCollision();
-        }, 200);
+        }, 50);
 
+        updateIntervals.push(updateCollisionInterval);
     }
 
     function checkBossBottleCollision() {
@@ -112,7 +107,8 @@
         if (timeSinceLastBottleCollision > DURATION_WOUNDED_STATE) {
             bossIsWounded = false;
         }
-        if (checkCollisionCondition(thrownBottleX, 80, BOSS_POSITION_X + bg_elements, BOSS_WIDTH, thrownBottleY, 65, BOSS_POSITION_Y, BOSS_HEIGHT)) {
+        let collisionTrue = checkCollisionCondition(thrownBottleX, 80, BOSS_POSITION_X + bg_elements, BOSS_WIDTH, thrownBottleY, 65, BOSS_POSITION_Y, BOSS_HEIGHT); 
+        if (collisionTrue && !bossIsWounded) {
             timeOfBottleCollision = new Date().getTime();
             AUDIO_BREAKING_BOTTLE.play();
             reduceBossEnergy();
@@ -120,7 +116,7 @@
     } 
     function checkBossCollision() {
         // Character energy reduced if he collides with enemy AND enough time has passed since last collision
-        if (checkCollisionCondition( character_x, characterWidth, BOSS_POSITION_X + bg_elements, BOSS_WIDTH , character_y, characterHeight, BOSS_POSITION_Y, BOSS_HEIGHT)) {        
+        if (checkCollisionCondition( character_x, characterWidth - 60, BOSS_POSITION_X + bg_elements, BOSS_WIDTH -100, character_y, characterHeight, BOSS_POSITION_Y, BOSS_HEIGHT)) {        
             reduceCharacterEnergy();
             bossAttack = true;
             AUDIO_PAIN.play();
@@ -148,7 +144,16 @@
         }, 1500);
         gameFinished = true;
         gameStarted = false;
-        init();
+
+        refreshIntervals(); 
+    }
+
+    function refreshIntervals() {
+        // Clears intervals for collision detection etc. to stop them when game is finished/over
+        updateIntervals.forEach((interval) => {
+            clearInterval(interval)
+        });
+        updateIntervals = [];
     }
 
     function checkCollisionCondition(collider_1_x, collider_1_width, collider_2_x, collider_2_width, collider_1_y, collider_1_height, collider_2_y, collider_2_height) {
@@ -165,19 +170,40 @@
             isWounded = false;
         }
         for (let i = 0; i < chickens.length; i++) {
-            let chicken = chickens[i];
-            let chickenWidth = canvas.width * chicken.scale_x; 
-            let chicken_x = chicken.position_x + bg_elements;  // calculates absolute position of chicken by taking background-movement into account
-            characterWidth = character_image.width * 0.35 - 60;
-
-            // Character energy reduced if he collides with enemy AND enough time has passed since last collision
-            if (timeSinceLastCollision > DURATION_WOUNDED_STATE && checkCollisionCondition( character_x, characterWidth, chicken_x, chickenWidth, character_y, characterHeight, chicken.position_y, 50)) {        
-                timeOfCollision = new Date().getTime();
-                reduceCharacterEnergy();
-                isWounded = true;
-                AUDIO_PAIN.play();
-            }
+            let collisionTrue = verifyChickenCollision(i);
+            verifyChickenDeath(i, collisionTrue);
+            let chickenDeath = chickens[i].isHurt;
+            verifyCharacterWounded(chickenDeath, collisionTrue);
         }
+    }
+
+    function verifyCharacterWounded(chickenDeath, collisionTrue) {
+        // Character energy reduced if he collides with enemy AND enough time has passed since last collision
+        if (!chickenDeath && (timeSinceLastCollision > DURATION_WOUNDED_STATE) && collisionTrue) {         
+            timeOfCollision = new Date().getTime();
+            reduceCharacterEnergy();
+            isWounded = true;
+            AUDIO_PAIN.play();
+        }  
+    }
+
+    function verifyChickenCollision(i) {
+        let chicken = chickens[i];
+        let chickenWidth = canvas.width * chicken.scale_x; 
+        let chicken_x = chicken.position_x + bg_elements;  // calculates absolute position of chicken by taking background-movement into account
+        characterWidth = character_image.width * 0.35 - 60;
+
+        let collisionTrue = checkCollisionCondition(character_x, characterWidth, chicken_x, chickenWidth, character_y, characterHeight, chicken.position_y, 80);
+        return collisionTrue;
+    }
+
+    function verifyChickenDeath(i, collisionTrue) {
+        // Chicken killed if character jumps on it
+        if (isJumping && collisionTrue) {
+            chickens[i].isHurt = true;
+            chickens[i].position_y = 440;
+        }
+        return 
     }
 
     function reduceCharacterEnergy() {
@@ -191,9 +217,9 @@
             AUDIO_BACKGROUND_MUSIC.pause();
             AUDIO_RUNNING.pause(); // pauses running audio when game over
             AUDIO_LOST.play();
+            refreshIntervals();
         }
     }
-
     function checkBottleCollision() {
         // check collision to pick-up bottle
         for (let i = 0; i < placedBottles.length; i++) {
@@ -205,14 +231,11 @@
            }; 
        };
     }
-
     function pickBottle(i) {
         placedBottles[i] = -2000; // moves bottle outside of visible canvas when picked
-        // .splice(i, 1);  // removes bottle from canvas when picked up
         AUDIO_BOTTLE.play();
         collectedBottles += COLLISION_BOTTLE_FILL;
     }
-
 
 /**
  * Create and calculate enemies
@@ -225,7 +248,8 @@
             'position_y':   430,
             'scale_x':      0.09,
             'scale_y':      0.2,
-            'speed':        (Math.random() * 10) // generates random speed between 1 and 10 px
+            'speed':        (Math.random() * 10), // generates random speed between 1 and 10 px
+            'isHurt':       false   
         }
     }
 
@@ -251,40 +275,33 @@
                 let chicken = chickens[i];
                 chicken.position_x -= chicken.speed; 
             }
-        }, 100);
+        }, 50);
 
-        // updateIntervals.push(updateChickenInterval); // Keep here
-
-        // Move to game over function
-        //updateIntervals.forEach((interval) => {
-        //    clearInterval(interval)
-        // });
-        
-        // updateIntervals = [];
-
+        updateIntervals.push(updateChickenInterval);
     }
 
     function calculateBossPosition() {
-
-        setInterval(function(){
-            console.log(BOSS_POSITION_X, (6600 + bg_elements), bossTurning);
-        }, 2000);
-
-        setInterval( function() {
-            if (boss_energy == 100)  {
-                if (BOSS_POSITION_X > (6600) && !bossTurning) {
-                    BOSS_POSITION_X -= 5;
-                } else if (BOSS_POSITION_X <= (6600)) {
-                    bossTurning = true;
-                    BOSS_POSITION_X += 5;  
-                } // else if (BOSS_POSITION_X >= (7000)) {
-                //     bossTurning = false;
-                // }   
+        let updateBossInterval = setInterval( function() {
+            if (boss_energy == 100)  {      // if boss enery is intact, he is moving around his initial spot
+                calculatePatrollingBoss();
             } 
-            else if (boss_energy < 100) {
-                BOSS_POSITION_X -= 8;
+            else if (boss_energy < 100) {   // if boss_energy is reduced, he will attack
+                BOSS_POSITION_X -= 10;
             }
         }, 100);
+        updateIntervals.push(updateBossInterval);
+    }
+
+    function calculatePatrollingBoss() {
+        if (BOSS_POSITION_X > (6800) && !bossTurning) {
+            BOSS_POSITION_X -= 5;
+        } if (BOSS_POSITION_X <= (6800)) {
+            bossTurning = true;
+        } if (BOSS_POSITION_X <= 7000 && bossTurning) {
+            BOSS_POSITION_X += 5;  
+        } if (BOSS_POSITION_X >= (7000)) {
+            bossTurning = false;
+        }   
     }
 
  /**
@@ -299,12 +316,14 @@
     }
 
     function checkCharacterMovement() {  
-        setInterval(function() {
+        let updateCharacterInterval = setInterval(function() {
             timePassedSinceJump = new Date().getTime() - lastJumpStarted;
             checkIfSleeping();
             animateCharacter();
             characterGraphicIndex++;
         }, 50);
+
+        updateIntervals.push(updateCharacterInterval);
     }
 
     function checkIfSleeping() {
@@ -317,7 +336,7 @@
     }
 
     function animateCharacter() {
-        let isJumping = (timePassedSinceJump < JUMP_TIME * 2) && !isWounded;
+        isJumping = (timePassedSinceJump < JUMP_TIME * 2) && !isWounded;
         // Check conditions for character-movements and animate if true
         animateRunningCharacter();
         animateJumpingCharacter(isJumping);
@@ -381,7 +400,6 @@
             lastJumpStarted = new Date().getTime();
         } 
     }
-
     function initiateBottleThrow(k) {
         if (k == 'd' && collectedBottles > 0) {
             let timePassed = new Date().getTime() - bottleThrowTime;
@@ -393,7 +411,6 @@
             }
         }
     }
-
     function checkKeyup() {
         document.addEventListener("keyup", e => {
             const k = e.key;

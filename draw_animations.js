@@ -11,7 +11,6 @@ let characterGraphicsDead = ['D-51.png','D-51.png','D-51.png','D-52.png','D-52.p
 let characterGraphicIndex = 0;
 let cloudOffset = 0;
 let skyGraphics = [''];
-let backgroundGraphics = ['1.png','1.png'];
 let chickenGraphics = ['1.Paso_derecho.png','1.Paso_derecho.png','1.Paso_derecho.png', '2.Centro.png', '2.Centro.png', '2.Centro.png', '3.Paso_izquierdo.png', '3.Paso_izquierdo.png', '3.Paso_izquierdo.png' ];
 let currentChickenIndex = 0;
 let bottleGraphicsStatic = ['1.Marcador.png', '2.Botella_enterrada1.png', '2.Botella_enterrada2.png'];
@@ -23,7 +22,7 @@ let bossGraphicsWounded = ['G21.png', 'G21.png', 'G21.png','G22.png', 'G22.png',
 let bossGraphicsDead = ['G24.png','G24.png','G24.png','G25.png','G25.png','G25.png','G26.png','G26.png','G26.png'];
 let currentBossIndex = 0;
 let bossImgPath;
-let allImgArrays = [skyGraphics, backgroundGraphics, backgroundGraphics, backgroundGraphics, backgroundGraphics, characterGraphicsMoving, characterGraphicsStanding, characterGraphicsJumping, characterGraphicsSleeping, characterGraphicsWounded, characterGraphicsDead, chickenGraphics, chickenGraphics, bossGraphicsWalking, bossGraphicsAngry, bossGraphicsAttacking, bossGraphicsWounded, bossGraphicsDead];
+let allImgArrays = [skyGraphics, fondImg, fondImg, fondImg, fondImg, characterGraphicsMoving, characterGraphicsStanding, characterGraphicsJumping, characterGraphicsSleeping, characterGraphicsWounded, characterGraphicsDead, chickenGraphics, chickenGraphics, bossGraphicsWalking, bossGraphicsAngry, bossGraphicsAttacking, bossGraphicsWounded, bossGraphicsDead];
 let allImgArraysPaths = ['./img/5.Fondo/Capas/5.cielo_1920-1080px.png', './img/5.Fondo/Capas/3.Fondo3/', './img/5.Fondo/Capas/2.Fondo2/', './img/5.Fondo/Capas/1.suelo-fondo1/', './img/5.Fondo/Capas/4.nubes/' ,'./img/2.Secuencias_Personaje-Pepe-corrección/2.Secuencia_caminata/', './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/IDLE/', './img/2.Secuencias_Personaje-Pepe-corrección/3.Secuencia_salto/', './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/LONG_IDLE/', './img/2.Secuencias_Personaje-Pepe-corrección/4.Herido/' ,'./img/2.Secuencias_Personaje-Pepe-corrección/5.Muerte/' ,'./img/3.Secuencias_Enemy_básico/Versión_Gallinita/', './img/3.Secuencias_Enemy_básico/Versión_pollito/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/1.Caminata/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/1.Alerta/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/2.Ataque/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/3.Herida/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/4.Muerte/' ];
 let bottle_base_image = new Image();
 let background_base_image;
@@ -33,7 +32,6 @@ let images = []; // check if this array is needed
 function draw() {
     setInterval(function() {
         drawBackground();
-        updateCharacter();
         drawFinalBoss();
         if (gameFinished || isDead) {
             drawFinalScreens();
@@ -41,6 +39,7 @@ function draw() {
          else if (gameStarted) {
             drawSideElements();
         }
+        updateCharacter();
     }, 50);
    //requestAnimationFrame(draw);
 }
@@ -92,11 +91,9 @@ function prepareNotification() {
             for (let k=0; k < currentArray.length; k++) {
                 let image = new Image();
                 image.src = allImgArraysPaths[j] + currentArray[k];
-                // console.log('Preload image', allImgArraysPaths[j] + currentArray[k]);
                 images.push(image); // push image-path to images-array (which contains all image-paths)
             }
         }
-        console.log('Preloaded images: ', images);
     } 
 
 /**
@@ -192,7 +189,13 @@ function prepareNotification() {
         for (let k = 0; k < chickens.length; k++) {
             let index = currentChickenIndex % chickenGraphics.length;
             let chicken = chickens[k];
-            addBackgroundObject(chicken.img_path + chickenGraphics[index], chicken.position_x, chicken.position_y, chicken.scale_x ,chicken.scale_y);
+            let chickenDead = chicken.isHurt;
+            if(!chickenDead) {
+                addBackgroundObject(chicken.img_path + chickenGraphics[index], chicken.position_x, chicken.position_y, chicken.scale_x ,chicken.scale_y);
+            } else {
+                chicken.speed = 0;
+                addBackgroundObject(chicken.img_path + '4.Muerte.png', chicken.position_x, chicken.position_y, chicken.scale_x ,chicken.scale_y);
+            }
             currentChickenIndex++;
         }   
     }
@@ -240,17 +243,19 @@ function prepareNotification() {
         if (opacity) {
             ctx.globalAlpha = opacity;
         }    
-        checkImageCacheBackground(src_path);
+        checkBackgroundImageCache(src_path);
         if (base_image.complete) {
             ctx.drawImage(base_image, offsetX + bg_elements, -100 + offsetY, (canvas.width +1) * scaleX , canvas.height * scaleY);
         };
         ctx.globalAlpha = 1;
     }
 
-    function checkImageCacheBackground(src_path) {
+    function checkBackgroundImageCache(src_path) {
+        // Check if image is found in images-array
         base_image = images.find(function(img) {
             return img.src.endsWith(src_path.substring(src_path, src_path.length));
         })
+        // Create new image if not found in cache
         if (!base_image) {
             base_image = new Image();
             base_image.src = src_path;
@@ -330,7 +335,6 @@ function prepareNotification() {
             currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/IDLE/' + characterGraphicsStanding[index];
         }    
     }
-
     function animateSleepingCharacter(isJumping) {
         //changes graphics for sleeping character (after inactivity)
         if (isSleeping && !isMovingLeft && !isMovingRight && !isJumping) {
@@ -338,7 +342,6 @@ function prepareNotification() {
             currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/LONG_IDLE/' + characterGraphicsSleeping[index];
         }
     }
-
     function animateWoundedCharacter() {
         // Change graphics for wounded character
         if (isWounded) {
@@ -346,7 +349,6 @@ function prepareNotification() {
             currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/4.Herido/' + characterGraphicsWounded[index];
         }    
     }
-
     function animateDeadCharacter() {
         // changes graphics when character dies
         if (isDead) {
@@ -378,7 +380,6 @@ function prepareNotification() {
            }
         }, 50);
     }  
-
      function animateBottleThrow(i) {
         let timePassed = new Date().getTime() - bottleThrowTime;
         let gravity = Math.pow(9.81, timePassed / 300);
