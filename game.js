@@ -2,49 +2,40 @@
  
  let canvas;
  let ctx;
- let character_image;  
- let characterHeight;
- let characterWidth;
- let character_x = 150;
- let character_y = 25;
- let character_energy = 100;
- let collectedBottles = 100;
- let isMovingRight = false;
- let isMovingLeft = false;
- let isSleeping = false;
- let isWounded = false;
- let bossIsWounded = false;
- let isDead = false;
  let bg_elements = 0;
- let timePassedSinceJump = 0; 
- let lastJumpStarted = 0;
- let chickens = [];
- let placedBottles = [508, 1560, 3070, 4500, 5800, 6400];
+ let collectedBottles = 0;
+ let placedBottles = [508, 1560, 2008, 3070, 4500, 5800, 6400];
  let bottle_y = 430;
  let bottleThrowTime = 0;
  let thrownBottleX = 0;
  let thrownBottleY = 0;
+
+ let isMovingRight = false;
+ let isMovingLeft = false;
+ let isSleeping = false;
+ let isWounded = false;
+ let isDead = false;
+ let isJumping = false;
+ let timePassedSinceJump = 0; 
+ let lastJumpStarted = 0;
+ 
+ let chickens = [];
+ let bossTurning = false;
+ let bossIsWounded = false;
  let boss_energy = 100;
- let currentTime = new Date().getTime();
- let timeSinceLastKeydown = 0;
- let timeSinceLastCollision = 4000;
- let timeOfCollision = 0;
- let bossDefeatedAt = 0;
- let characterDefeatedAt = 0;
- let timeSinceLastBottleCollision = 1000;
- let timeOfBottleCollision; 
+ 
  let gameFinished = false;
  let gameStarted = false;
- let bossAttack = false;
- let bossTurning = false;
+ let currentTime = new Date().getTime();
+ let timeSinceLastKeydown = 0;
  let updateIntervals = []; // array of interval-functions that are carried out
- let isJumping = false;
+
 
 
  // ----------- Game config
  let LEVEL_LENGTH = 8; // indicates how often canvas-length is repeated (canvas-length = 1080px)
  let JUMP_TIME = 450; // in ms
- let GAME_SPEED = 18;
+ let GAME_SPEED = 16;
  let AUDIO_RUNNING = new Audio ('./audio/running.mp3');
  let AUDIO_JUMP = new Audio ('./audio/jump.mp3');
  let AUDIO_BOTTLE = new Audio ('./audio/bottle.mp3');
@@ -55,6 +46,7 @@
  let AUDIO_WIN = new Audio ('./audio/win.mp3');
  let AUDIO_PAIN = new Audio ('./audio/pain.mp3');
  let AUDIO_LOST = new Audio ('./audio/defeat.mp3');
+ let AUDIO_CHICKEN_SQUASHED = new Audio ('./audio/squash.mp3');
  let BOSS_POSITION_X = 7000;
  let BOSS_POSITION_Y = 130;
  let BOSS_WIDTH = 350;
@@ -73,6 +65,7 @@
     draw();
  }
  function startGame() {
+    // activate full game logic (collision checks, animation of enemies, key-listener etc.) when start-btn clicked
     gameStarted = true;
     AUDIO_BACKGROUND_MUSIC.play();
     runGameLogic();
@@ -87,156 +80,7 @@
     document.getElementById('start-btn').classList.add('d-none'); // hides start-btn 
  }
 
- /**
-  * Check for collisions
-  */
-
-    function checkForCollision() {
-        let updateCollisionInterval = setInterval(function(){
-            checkChickenCollision();
-            checkBottleCollision();
-            checkBossBottleCollision();
-            checkBossCollision();
-        }, 50);
-
-        updateIntervals.push(updateCollisionInterval);
-    }
-
-    function checkBossBottleCollision() {
-        timeSinceLastBottleCollision = new Date().getTime() - timeOfBottleCollision;
-        if (timeSinceLastBottleCollision > DURATION_WOUNDED_STATE) {
-            bossIsWounded = false;
-        }
-        let collisionTrue = checkCollisionCondition(thrownBottleX, 80, BOSS_POSITION_X + bg_elements, BOSS_WIDTH, thrownBottleY, 65, BOSS_POSITION_Y, BOSS_HEIGHT); 
-        if (collisionTrue && !bossIsWounded) {
-            timeOfBottleCollision = new Date().getTime();
-            AUDIO_BREAKING_BOTTLE.play();
-            reduceBossEnergy();
-        }
-    } 
-    function checkBossCollision() {
-        // Character energy reduced if he collides with enemy AND enough time has passed since last collision
-        if (checkCollisionCondition( character_x, characterWidth - 60, BOSS_POSITION_X + bg_elements, BOSS_WIDTH -100, character_y, characterHeight, BOSS_POSITION_Y, BOSS_HEIGHT)) {        
-            reduceCharacterEnergy();
-            bossAttack = true;
-            AUDIO_PAIN.play();
-        }
-    }
-
-    function reduceBossEnergy() {
-        // Reduce boss energy and trigger wounded-animation
-        if (boss_energy > 0) {
-            boss_energy -= COLLISION_ENERGY_LOSS;
-            bossIsWounded = true;
-        } 
-        // Trigger levelFinish-Animation if boss energy <= 0
-        if (boss_energy <= 0 && bossDefeatedAt == 0) {
-            bossDefeatedAt = new Date().getTime();
-            finishLevel();
-        }
-    }
-
-    function finishLevel() {
-        AUDIO_CHICKEN.play();
-        AUDIO_BACKGROUND_MUSIC.pause();
-        setTimeout(function() {
-            AUDIO_WIN.play();
-        }, 1500);
-        gameFinished = true;
-        gameStarted = false;
-
-        refreshIntervals(); 
-    }
-
-    function refreshIntervals() {
-        // Clears intervals for collision detection etc. to stop them when game is finished/over
-        updateIntervals.forEach((interval) => {
-            clearInterval(interval)
-        });
-        updateIntervals = [];
-    }
-
-    function checkCollisionCondition(collider_1_x, collider_1_width, collider_2_x, collider_2_width, collider_1_y, collider_1_height, collider_2_y, collider_2_height) {
-        // defines range for x-position in which collision is detected
-        let x_condition = ((collider_1_x - collider_1_width/2) < (collider_2_x + collider_2_width/2) && (collider_1_x + collider_1_width/2) > (collider_2_x - collider_2_width/2));
-        // defines range for y-position in which collision is detected
-        let y_condition = ((collider_1_y + collider_1_height) > collider_2_y) && (collider_1_y < (collider_2_y + collider_2_height)) ;
-        return (x_condition && y_condition);
-    }
-
-    function checkChickenCollision() {
-        timeSinceLastCollision = new Date().getTime() - timeOfCollision;
-        if (timeSinceLastCollision > DURATION_WOUNDED_STATE) {    // wounded state prevents from jumping and triggers wounded-animation
-            isWounded = false;
-        }
-        for (let i = 0; i < chickens.length; i++) {
-            let collisionTrue = verifyChickenCollision(i);
-            verifyChickenDeath(i, collisionTrue);
-            let chickenDeath = chickens[i].isHurt;
-            verifyCharacterWounded(chickenDeath, collisionTrue);
-        }
-    }
-
-    function verifyCharacterWounded(chickenDeath, collisionTrue) {
-        // Character energy reduced if he collides with enemy AND enough time has passed since last collision
-        if (!chickenDeath && (timeSinceLastCollision > DURATION_WOUNDED_STATE) && collisionTrue) {         
-            timeOfCollision = new Date().getTime();
-            reduceCharacterEnergy();
-            isWounded = true;
-            AUDIO_PAIN.play();
-        }  
-    }
-
-    function verifyChickenCollision(i) {
-        let chicken = chickens[i];
-        let chickenWidth = canvas.width * chicken.scale_x; 
-        let chicken_x = chicken.position_x + bg_elements;  // calculates absolute position of chicken by taking background-movement into account
-        characterWidth = character_image.width * 0.35 - 60;
-
-        let collisionTrue = checkCollisionCondition(character_x, characterWidth, chicken_x, chickenWidth, character_y, characterHeight, chicken.position_y, 80);
-        return collisionTrue;
-    }
-
-    function verifyChickenDeath(i, collisionTrue) {
-        // Chicken killed if character jumps on it
-        if (isJumping && collisionTrue) {
-            chickens[i].isHurt = true;
-            chickens[i].position_y = 440;
-        }
-        return 
-    }
-
-    function reduceCharacterEnergy() {
-        character_energy -= COLLISION_ENERGY_LOSS;  // reduce energy when hit by enemy
-        if (bossAttack) {       
-            character_energy == 0;  // immediate death when character collides with boss
-        }        
-        if (character_energy <= 0) {
-            isDead = true;
-            characterDefeatedAt = new Date().getTime();
-            AUDIO_BACKGROUND_MUSIC.pause();
-            AUDIO_RUNNING.pause(); // pauses running audio when game over
-            AUDIO_LOST.play();
-            refreshIntervals();
-        }
-    }
-    function checkBottleCollision() {
-        // check collision to pick-up bottle
-        for (let i = 0; i < placedBottles.length; i++) {
-           let bottleWidth = (canvas.width * 0.125); 
-           let bottle_x = placedBottles[i] + bg_elements;  
-   
-           if (checkCollisionCondition(bottle_x, bottleWidth, character_x, (characterWidth -75), character_y, characterHeight, bottle_y, 100 )) { 
-               pickBottle(i);
-           }; 
-       };
-    }
-    function pickBottle(i) {
-        placedBottles[i] = -2000; // moves bottle outside of visible canvas when picked
-        AUDIO_BOTTLE.play();
-        collectedBottles += COLLISION_BOTTLE_FILL;
-    }
-
+ 
 /**
  * Create and calculate enemies
  */
@@ -263,6 +107,12 @@
             createChicken(gallinitaPath, 2.8 * canvas.width), 
             createChicken(pollitoPath, 3.3 * canvas.width), 
             createChicken(pollitoPath, 5.6 * canvas.width),   
+            createChicken(pollitoPath, 5 * canvas.width),             
+            createChicken(pollitoPath, 0.8 * canvas.width), 
+            createChicken(gallinitaPath, 1* canvas.width ),
+            createChicken(gallinitaPath, 2.3 * canvas.width), 
+            createChicken(pollitoPath, 3.0 * canvas.width), 
+            createChicken(pollitoPath, 4.2 * canvas.width),   
             createChicken(pollitoPath, 5 * canvas.width), 
             createChicken(gallinitaPath, 6.5* canvas.width ),
             createChicken(pollitoPath, 8 * canvas.width)
@@ -276,7 +126,6 @@
                 chicken.position_x -= chicken.speed; 
             }
         }, 50);
-
         updateIntervals.push(updateChickenInterval);
     }
 
@@ -284,9 +133,10 @@
         let updateBossInterval = setInterval( function() {
             if (boss_energy == 100)  {      // if boss enery is intact, he is moving around his initial spot
                 calculatePatrollingBoss();
-            } 
-            else if (boss_energy < 100) {   // if boss_energy is reduced, he will attack
-                BOSS_POSITION_X -= 10;
+            } else if (boss_energy < 100) {   // if boss_energy is reduced, he will attack
+                BOSS_POSITION_X -= 15;
+            } else if (boss_energy < 60) {   // if boss_energy is reduced, he will attack
+                BOSS_POSITION_X -= 20;
             }
         }, 100);
         updateIntervals.push(updateBossInterval);
@@ -423,4 +273,36 @@
         });
     }
 
+    /**
+     * End of game functions
+     */
+
+    function finishLevel() {
+        AUDIO_CHICKEN.play();
+        AUDIO_BACKGROUND_MUSIC.pause();
+        setTimeout(function() {
+            AUDIO_WIN.play();
+        }, 1500);
+        gameFinished = true;
+        gameStarted = false;
+
+        refreshIntervals(); 
+    }
+
+    function gameOver() {
+        isDead = true;
+        characterDefeatedAt = new Date().getTime();
+        AUDIO_BACKGROUND_MUSIC.pause();
+        AUDIO_RUNNING.pause(); // pauses running audio when game over
+        AUDIO_LOST.play();
+        setTimeout(refreshIntervals, 2000);
+    }
+
+    function refreshIntervals() {
+        // Clears intervals for collision detection etc. to stop them when game is finished/over
+        updateIntervals.forEach((interval) => {
+            clearInterval(interval)
+        });
+        updateIntervals = [];
+    }
  
