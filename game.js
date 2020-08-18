@@ -20,6 +20,10 @@
     checkForCollision();
     document.getElementById('restart-btn').classList.remove('d-none'); // makes restart btn visible
     document.getElementById('start-btn').classList.add('d-none'); // hides start-btn 
+    document.getElementById('restart-btn').classList.add('restart-btn-mobile');
+    document.getElementById('heading').classList.add('h1-mobile');
+    document.getElementById('overlay').classList.add('d-none');
+    document.getElementById('btn-box').classList.add('btn-box-mobile');
  }
 
  
@@ -49,12 +53,12 @@
             createChicken(gallinitaPath, 2.8 * canvas.width), 
             createChicken(pollitoPath, 3.3 * canvas.width), 
             createChicken(pollitoPath, 5.6 * canvas.width),   
-            createChicken(pollitoPath, 5 * canvas.width),             
+            createChicken(gallinitaPath, 5 * canvas.width),             
             createChicken(pollitoPath, 0.8 * canvas.width), 
             createChicken(gallinitaPath, 1* canvas.width ),
             createChicken(gallinitaPath, 2.3 * canvas.width), 
             createChicken(pollitoPath, 3.0 * canvas.width), 
-            createChicken(pollitoPath, 4.2 * canvas.width),   
+            createChicken(gallinitaPath, 4.2 * canvas.width),   
             createChicken(pollitoPath, 5 * canvas.width), 
             createChicken(gallinitaPath, 6.5* canvas.width ),
             createChicken(pollitoPath, 8 * canvas.width)

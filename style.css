@@ -1,14 +1,3 @@
-body {
-    font-family: "Bradley Hand ITC";
-    background-color: #d8d5d5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
-    height: 100vh;
-    overflow: hidden;
-}
-
 h1 {
     font-size: 3rem;
     font-weight: bold;
@@ -17,6 +6,18 @@ h1 {
     padding: 0.5vh 3vw;
     text-align: center;
     color: white;
+    border-radius: 12px;
+}
+
+.wrapper {
+    font-family: "Bradley Hand ITC";
+    background-color: #d8d5d5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .canvas-box {
@@ -50,13 +51,13 @@ h1 {
     margin-top: 2vh;
     font-size: 2rem;
     padding: 0.2rem 2rem;
-    background-color: #8b0000;
+    background: rgba(86, 86, 95, 1);
     border: none;
     font-weight: bold;
 }
 
 .btn-secondary:hover {
-    background-color: rgb(197, 9, 9);
+    background-color: rgb(143, 7, 7);
 }
 
 .d-none {
@@ -66,5 +67,118 @@ h1 {
 #canvas {
     border: 4px solid black;
     border-radius: 8px;
+}
+
+
+
+/* Smartphones and tablets (Landscape-View) */
+@media (max-width: 830px)  {
+
+    h1 {
+        position: absolute;
+        top: 4vh;
+        right: auto;
+        left: auto;
+        z-index: 5;
+        font-size: 3rem;
+    }
+    .wrapper {
+        background-color: rgb(59, 58, 58);
+    }
+    .heading-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .h1-mobile {
+        top: 1vh;
+        font-size: 1.5rem;
+    }
+    .canvas-box {
+        padding: unset;
+        overflow: hidden;
+        background: unset;
+    }
+    .btn-box {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        bottom: 10vh;
+    }
+    .btn-box-mobile {
+        align-items: unset;
+        left: 1.5vw;
+        bottom: 0;
+    }
+    .btn-secondary {
+        bottom: 10vh;
+        width: auto;
+        z-index: 5;
+
+    }
+    .restart-btn-mobile {
+        font-size: 1.2rem;
+        background: rgb(35, 35, 146);
+        margin-bottom: unset;
+    }
+
+    .mobile-overlay {
+        background-color: rgba(100, 110, 116, 0.411);
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 4;
+    }
+
+    #canvas {
+        border-radius: unset;
+        border: unset;
+        /* height: 100vh; */
+        width: 100vw;
+        object-fit: scale-down;
+    }
+}
+
+/* Smartphones & tablets (portrait-view) */ 
+@media (max-width: 450px) and (min-height: 400px) {
+    
+    body{
+        margin:0;
+        overflow:hidden;
+    }
+    /* flip screen by 90 degrees when in portrait-view */
+    .wrapper {
+        transform: rotate(90deg);
+        transform-origin: bottom left;
+        position: absolute;
+        top: -100vw;
+        left: 0;
+        height: 100vw;
+        width: 99.9vh;
+        overflow: auto;
+    }
+    .heading-box {
+        align-items: unset;
+    }
+    .canvas-box {
+        width: 100vh;
+        height: 100vw;
+    }
+    #canvas {
+        width: 100vh;
+        height: 100vw;
+    }
+}
+
+@media (max-width: 600px) {
+    .btn-secondary {
+        padding: 0.1rem 1rem;
+    }
+
+    .restart-btn-mobile {
+        padding: 0.1rem 1rem;
+    }
 }
 

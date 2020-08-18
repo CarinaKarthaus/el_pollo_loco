@@ -19,19 +19,23 @@
 </head>
 
 <body onload="init()">
-    <div class="header-box">
-        <h1>El Pollo Loco</h1>
-    </div>
+    <div class="wrapper">
+        <div class="heading-box">
+            <h1 id="heading">El Pollo Loco</h1>
+        </div>
+    
+        <div class="canvas-box">
+            <canvas id="canvas" width="1080" height="500"></canvas>
+        </div>
+    
+        <div id="btn-box" class="btn-box">
+            <button id="start-btn" class="btn btn-secondary" onclick="startGame()">Start!</button>
+            <button id="restart-btn" class="btn btn-secondary d-none" onclick="window.location.reload()">Restart!</button>
+        </div>
+        <div class="mobile-overlay" id="overlay"></div>  
 
-    <div class="canvas-box">
-        <canvas id="canvas" width="1080" height="500"></canvas>
     </div>
-
-    <div class="btn-box">
-        <button id="start-btn" class="btn btn-secondary" onclick="startGame()">Start!</button>
-        <button id="restart-btn" class="btn btn-secondary d-none" onclick="window.location.reload()">Restart!</button>
-    </div>
-
+    
 </body>
 
 </html>
