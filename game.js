@@ -1,62 +1,4 @@
  // Main script to handle basic game configurations and functions
- 
- let canvas;
- let ctx;
- let bg_elements = 0;
- let collectedBottles = 0;
- let placedBottles = [508, 1560, 2008, 3070, 4500, 5800, 6400];
- let bottle_y = 430;
- let bottleThrowTime = 0;
- let thrownBottleX = 0;
- let thrownBottleY = 0;
-
- let isMovingRight = false;
- let isMovingLeft = false;
- let isSleeping = false;
- let isWounded = false;
- let isDead = false;
- let isJumping = false;
- let timePassedSinceJump = 0; 
- let lastJumpStarted = 0;
- 
- let chickens = [];
- let bossTurning = false;
- let bossIsWounded = false;
- let boss_energy = 100;
- 
- let gameFinished = false;
- let gameStarted = false;
- let currentTime = new Date().getTime();
- let timeSinceLastKeydown = 0;
- let updateIntervals = []; // array of interval-functions that are carried out
-
-
-
- // ----------- Game config
- let LEVEL_LENGTH = 8; // indicates how often canvas-length is repeated (canvas-length = 1080px)
- let JUMP_TIME = 450; // in ms
- let GAME_SPEED = 16;
- let AUDIO_RUNNING = new Audio ('./audio/running.mp3');
- let AUDIO_JUMP = new Audio ('./audio/jump.mp3');
- let AUDIO_BOTTLE = new Audio ('./audio/bottle.mp3');
- let AUDIO_THROW = new Audio ('./audio/throw.mp3');
- let AUDIO_CHICKEN = new Audio ('./audio/chicken.mp3');
- let AUDIO_BREAKING_BOTTLE = new Audio ('./audio/breaking_bottle.mp3');
- let AUDIO_BACKGROUND_MUSIC = new Audio ('./audio/background_music.mp3');
- let AUDIO_WIN = new Audio ('./audio/win.mp3');
- let AUDIO_PAIN = new Audio ('./audio/pain.mp3');
- let AUDIO_LOST = new Audio ('./audio/defeat.mp3');
- let AUDIO_CHICKEN_SQUASHED = new Audio ('./audio/squash.mp3');
- let BOSS_POSITION_X = 7000;
- let BOSS_POSITION_Y = 130;
- let BOSS_WIDTH = 350;
- let BOSS_HEIGHT = 400;
- let COLLISION_ENERGY_LOSS = 20;
- let COLLISION_BOTTLE_FILL = 20;
- let DURATION_WOUNDED_STATE = 800;
-
- AUDIO_BACKGROUND_MUSIC.loop = true;
- AUDIO_BACKGROUND_MUSIC.volume = 0.5;
 
  function init() {
     canvas = document.getElementById('canvas');
@@ -125,7 +67,7 @@
                 let chicken = chickens[i];
                 chicken.position_x -= chicken.speed; 
             }
-        }, 50);
+        }, 80);
         updateIntervals.push(updateChickenInterval);
     }
 
@@ -134,11 +76,11 @@
             if (boss_energy == 100)  {      // if boss enery is intact, he is moving around his initial spot
                 calculatePatrollingBoss();
             } else if (boss_energy < 100) {   // if boss_energy is reduced, he will attack
-                BOSS_POSITION_X -= 15;
-            } else if (boss_energy < 60) {   // if boss_energy is reduced, he will attack
                 BOSS_POSITION_X -= 20;
+            } else if (boss_energy < 60) {   // if boss_energy is reduced, he will attack
+                BOSS_POSITION_X -= 25;
             }
-        }, 100);
+        }, 80);
         updateIntervals.push(updateBossInterval);
     }
 
@@ -278,11 +220,10 @@
      */
 
     function finishLevel() {
-        AUDIO_CHICKEN.play();
         AUDIO_BACKGROUND_MUSIC.pause();
         setTimeout(function() {
             AUDIO_WIN.play();
-        }, 1500);
+        }, 1200);
         gameFinished = true;
         gameStarted = false;
 

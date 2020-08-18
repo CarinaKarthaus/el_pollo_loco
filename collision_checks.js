@@ -2,15 +2,6 @@
   * Check for collisions
   */
 
- let bossAttack = false;
- let timeSinceLastBottleCollision = 1000;
- let timeOfBottleCollision; 
- let timeSinceLastCollision = 4000;
- let timeOfCollision = 0;
- let bossDefeatedAt = 0;
- let characterDefeatedAt = 0;
-
-
  function checkForCollision() {
     // overall-function to initiate collision-checks
     let updateCollisionInterval = setInterval(function(){   
@@ -33,6 +24,7 @@ function checkBossBottleCollision() {
         timeOfBottleCollision = new Date().getTime();
         AUDIO_BREAKING_BOTTLE.play();
         reduceBossEnergy();
+        AUDIO_CHICKEN.play();
     }
 } 
 function checkBossCollision() {

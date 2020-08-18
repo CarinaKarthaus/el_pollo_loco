@@ -6,7 +6,7 @@ body {
     align-items: center;
     justify-content: space-evenly;
     height: 100vh;
-
+    overflow: hidden;
 }
 
 h1 {

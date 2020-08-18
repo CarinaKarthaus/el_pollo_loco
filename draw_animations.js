@@ -1,25 +1,5 @@
 // Script to handle calculation and drawing of animations
 
-let fondImg = ['1.png', '2.png'];
-let cloudOffset = 0;
-let skyGraphics = [''];
-let chickenGraphics = ['1.Paso_derecho.png','1.Paso_derecho.png','1.Paso_derecho.png', '2.Centro.png', '2.Centro.png', '2.Centro.png', '3.Paso_izquierdo.png', '3.Paso_izquierdo.png', '3.Paso_izquierdo.png' ];
-let currentChickenIndex = 0;
-let bottleGraphicsStatic = ['1.Marcador.png', '2.Botella_enterrada1.png', '2.Botella_enterrada2.png'];
-let bottleGraphicsRotating = ['botella_rotación1.png','botella_rotación1.png', 'botella_rotación2.png', 'botella_rotación2.png', 'botella_rotación3.png', 'botella_rotación3.png', 'botella_rotación4.png', 'botella_rotación4.png'];
-let bossGraphicsWalking = ['G1.png', 'G1.png', 'G1.png', 'G2.png','G2.png','G2.png', 'G3.png', 'G3.png', 'G3.png', 'G4.png', 'G4.png', 'G4.png' ];
-let bossGraphicsAngry = ['G5.png','G5.png','G5.png', 'G6.png', 'G6.png', 'G6.png', 'G7.png', 'G7.png', 'G7.png', 'G8.png', 'G8.png', 'G8.png', 'G9.png', 'G9.png', 'G9.png', 'G10.png', 'G10.png', 'G10.png', 'G11.png','G11.png','G11.png', 'G12.png', 'G12.png', 'G12.png' ];
-let bossGraphicsAttacking = ['G13.png','G13.png','G13.png', 'G14.png', 'G14.png', 'G14.png', 'G15.png', 'G15.png', 'G15.png', 'G16.png', 'G16.png', 'G16.png', 'G17.png', 'G17.png', 'G17.png', 'G18.png', 'G18.png', 'G18.png', 'G19.png','G19.png','G19.png', 'G20.png', 'G20.png', 'G20.png'];
-let bossGraphicsWounded = ['G21.png', 'G21.png', 'G21.png','G22.png', 'G22.png', 'G22.png','G23.png', 'G23.png', 'G23.png'];
-let bossGraphicsDead = ['G24.png','G24.png','G24.png','G25.png','G25.png','G25.png','G26.png','G26.png','G26.png'];
-let currentBossIndex = 0;
-let bossImgPath;
-let allImgArrays = [skyGraphics, fondImg, fondImg, fondImg, fondImg, characterGraphicsMoving, characterGraphicsStanding, characterGraphicsJumping, characterGraphicsSleeping, characterGraphicsWounded, characterGraphicsDead, chickenGraphics, chickenGraphics, bossGraphicsWalking, bossGraphicsAngry, bossGraphicsAttacking, bossGraphicsWounded, bossGraphicsDead];
-let allImgArraysPaths = ['./img/5.Fondo/Capas/5.cielo_1920-1080px.png', './img/5.Fondo/Capas/3.Fondo3/', './img/5.Fondo/Capas/2.Fondo2/', './img/5.Fondo/Capas/1.suelo-fondo1/', './img/5.Fondo/Capas/4.nubes/' ,'./img/2.Secuencias_Personaje-Pepe-corrección/2.Secuencia_caminata/', './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/IDLE/', './img/2.Secuencias_Personaje-Pepe-corrección/3.Secuencia_salto/', './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/LONG_IDLE/', './img/2.Secuencias_Personaje-Pepe-corrección/4.Herido/' ,'./img/2.Secuencias_Personaje-Pepe-corrección/5.Muerte/' ,'./img/3.Secuencias_Enemy_básico/Versión_Gallinita/', './img/3.Secuencias_Enemy_básico/Versión_pollito/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/1.Caminata/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/1.Alerta/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/2.Ataque/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/3.Herida/', './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/4.Muerte/' ];
-let bottle_base_image = new Image();
-let background_base_image;
-let images = []; 
-
 function draw() {
     setInterval(function() {
         drawBackground();
@@ -126,7 +106,7 @@ function prepareNotification() {
      }
 
      function drawBottleBar() {
-         let bottleBarPath;
+        let bottleBarPath;
         if (collectedBottles <= 100) {
             bottleBarPath = './img/7.Marcadores/Barra/Marcador_botella/Azul/' + collectedBottles + '_.png';
         } else {
@@ -179,8 +159,8 @@ function prepareNotification() {
     function animateBossDefeat(index) {
         if (bossDefeatedAt > 0) {
             let timePassed = new Date().getTime() - bossDefeatedAt;
-            BOSS_POSITION_X += timePassed / 20;
-            BOSS_POSITION_Y -= timePassed / 10;
+            BOSS_POSITION_X += timePassed / 18;
+            BOSS_POSITION_Y -= timePassed / 14;
             index = currentBossIndex % bossGraphicsDead.length;
             bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/4.Muerte/' + bossGraphicsDead[index];
         }

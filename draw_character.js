@@ -1,21 +1,6 @@
 /**
  * Main file to draw and animate character movements
  */
-let character_image;  
-let characterHeight;
-let characterWidth;
-let character_x = 150;
-let character_y = 25;
-let character_energy = 100;
-let currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/IDLE/I-1.png';
-let characterGraphicsMoving = ['W-21.png', 'W-22.png','W-23.png', 'W-24.png','W-25.png', 'W-26.png'];
-let characterGraphicsStanding = ['I-1.png','I-1.png','I-1.png','I-2.png','I-2.png','I-2.png','I-3.png','I-3.png','I-3.png','I-4.png','I-4.png','I-4.png','I-5.png','I-5.png','I-5.png','I-6.png','I-6.png','I-6.png','I-7.png','I-7.png','I-7.png','I-8.png','I-8.png','I-8.png','I-9.png','I-9.png','I-9.png','I-10.png','I-10.png','I-10.png'];
-let characterGraphicsJumping = ['J-31.png','J-31.png','J-32.png','J-32.png','J-33.png','J-33.png','J-34.png','J-34.png','J-35.png','J-35.png','J-36.png','J-36.png','J-37.png','J-37.png','J-38.png','J-38.png','J-39.png','J-39.png'];
-let characterGraphicsSleeping = ['I-11.png','I-11.png','I-11.png','I-12.png','I-12.png','I-12.png','I-13.png','I-13.png','I-13.png','I-14.png','I-14.png','I-14.png','I-15.png','I-15.png','I-15.png','I-16.png','I-16.png','I-16.png','I-17.png','I-17.png','I-17.png','I-18.png','I-18.png','I-18.png','I-19.png','I-19.png','I-19.png', 'I-20.png', 'I-20.png', 'I-20.png'];
-let characterGraphicsWounded = ['H-41.png', 'H-41.png', 'H-41.png', 'H-42.png', 'H-42.png', 'H-42.png', 'H-43.png', 'H-43.png', 'H-43.png'];
-let characterGraphicsDead = ['D-51.png','D-51.png','D-51.png','D-52.png','D-52.png','D-52.png','D-53.png','D-53.png','D-53.png','D-54.png','D-54.png','D-54.png','D-55.png','D-55.png','D-55.png','D-56.png','D-56.png', 'D-56.png','D-57.png','D-57.png','D-57.png'];
-let characterGraphicIndex = 0;
-
 
 function updateCharacter(){
     checkImageCache(); // check if character images are preloaded in cache 
