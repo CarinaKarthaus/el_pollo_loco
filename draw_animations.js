@@ -11,7 +11,7 @@ function draw() {
             drawSideElements();
         }
         updateCharacter();
-    }, 50);
+    }, 100);
    //requestAnimationFrame(draw);
 }
 
@@ -255,7 +255,7 @@ function prepareNotification() {
                 animateBottleThrow(i);           
                 i++;
            }
-        }, 50);
+        }, 60);
     }  
      function animateBottleThrow(i) {
         let timePassed = new Date().getTime() - bottleThrowTime;

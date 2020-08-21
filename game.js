@@ -11,6 +11,7 @@
     gameStarted = true;
     AUDIO_BACKGROUND_MUSIC.play();
     runGameLogic();
+    arrangeUI();
  }
 
  function runGameLogic() {
@@ -18,12 +19,16 @@
     calculateDrawingDetails();
     listenForKeys();
     checkForCollision();
+    moveOnMobile();
+ }
+
+ function arrangeUI() {
     document.getElementById('restart-btn').classList.remove('d-none'); // makes restart btn visible
     document.getElementById('start-btn').classList.add('d-none'); // hides start-btn 
-    document.getElementById('restart-btn').classList.add('restart-btn-mobile');
-    document.getElementById('heading').classList.add('h1-mobile');
-    document.getElementById('overlay').classList.add('d-none');
-    document.getElementById('btn-box').classList.add('btn-box-mobile');
+    document.getElementById('restart-btn').classList.add('restart-btn-mobile'); //adapts btn for mobile-view
+    document.getElementById('heading').classList.add('h1-mobile'); //adapts for mobile-view
+    document.getElementById('overlay').classList.add('d-none'); // removes overlay
+    document.getElementById('btn-box').classList.add('btn-box-mobile'); //adapts for mobile-view
  }
 
  

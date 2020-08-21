@@ -1,17 +1,18 @@
 h1 {
-    font-size: 3rem;
+    font-size: 3.5rem;
     font-weight: bold;
     margin: 0.5rem 0;
-    background-color: rgb(150, 40, 40);
-    padding: 0.5vh 3vw;
+    background-color: #A02209;
+    padding: 0.5vh 8vw;
     text-align: center;
     color: white;
-    border-radius: 12px;
+    border-radius: 44% 20% 55% 25%;
 }
 
 .wrapper {
     font-family: "Bradley Hand ITC";
-    background-color: #d8d5d5;
+    background-color: rgba(180, 179, 179, 0.699);
+    background: linear-gradient(180deg, rgba(216, 216, 216, 0.699), rgba(180, 179, 179, 0.699),  rgba(122, 121, 121, 0.699));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -34,13 +35,15 @@ h1 {
         linear-gradient(45deg,
         #a32a061e 25%,
         rgba(0,0,0,0) 25.1%),
-        #cccccc;
+        #cecdcd;
     background-size: 40px 40px;
     background-position: -20px 0, -20px 0, 0 0, 0 0;
-    width: 100vw;
-    padding: 5vh 0;
+    width: 1150px;
+    padding: 3vh 0;
     display: flex;
     justify-content: center;
+    border: 4px solid #685e5b56;
+    border-radius: 8px;
 }
 
 .btn-box {
@@ -54,6 +57,7 @@ h1 {
     background: rgba(86, 86, 95, 1);
     border: none;
     font-weight: bold;
+    border-radius: 20% 44% 25% 55%;
 }
 
 .btn-secondary:hover {
@@ -65,7 +69,7 @@ h1 {
 }
 
 #canvas {
-    border: 4px solid black;
+    border: 4px solid #706966a9;
     border-radius: 8px;
 }
 
@@ -98,6 +102,7 @@ h1 {
         padding: unset;
         overflow: hidden;
         background: unset;
+        border: unset;
     }
     .btn-box {
         position: absolute;
