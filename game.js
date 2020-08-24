@@ -164,14 +164,15 @@
  * Check player commands 
  */
     function listenForKeys() {
-            document.addEventListener("keydown", e => {
-                const k = e.key;
-                checkKeydown(k, e);
-                saveKeydownTime(k, e); 
-                preventJumping(e); 
-                initiateBottleThrow(k);     
-            }); 
-            checkKeyup(); 
+        startupMobileListeners();
+        document.addEventListener("keydown", e => {
+            const k = e.key;
+            checkKeydown(k, e);
+            saveKeydownTime(k, e); 
+            preventJumping(e); 
+            initiateBottleThrow(k);     
+        }); 
+        checkKeyup(); 
     }
 
     function saveKeydownTime(k, e) {
@@ -197,7 +198,8 @@
     function preventJumping(e) {
         // prevent double-jumping or jumping when character is wounded
         timePassedSinceJump = new Date().getTime() - lastJumpStarted;
-        if (e.code == 'Space' && timePassedSinceJump > JUMP_TIME * 2 && !isWounded) { 
+        let jumpingCondition = e.code == 'Space' && timePassedSinceJump > JUMP_TIME * 2 && !isWounded;
+        if (jumpingCondition) { 
             lastJumpStarted = new Date().getTime();
         } 
     }
