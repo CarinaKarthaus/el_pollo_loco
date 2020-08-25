@@ -3,6 +3,7 @@ let touchpointX;
 let Y_touchpoints = new Array();
 let ongoingTouches = new Array();
 let jumpOnMobile = false;
+let clickTimer = null;
 
 
 function startupMobileListeners() {
@@ -16,8 +17,8 @@ function handleStart(e) {
         if (e) {
             touchpointX = e.touches[i].pageX;
             touchpointY = e.touches[i].screenY;
-            console.log('touchpointX: ' + touchpointX);  
-            console.log('touchpointY: ', touchpointY);  
+            // console.log('touchpointX: ' + touchpointX);  
+            // console.log('touchpointY: ', touchpointY);  
         } 
         moveOnMobile();
     }
@@ -39,9 +40,9 @@ function handleMove(e) {
 
 function checkForJump() {
     let heightDifference = Y_touchpoints[0] - Y_touchpoints[Y_touchpoints.length -1];
-    console.log(heightDifference);
+    // console.log(heightDifference);
 
-    if (heightDifference >= 60) {       // trigger jump when touchmove exceeds 20px in y-direction
+    if (heightDifference >= 80) {       // trigger jump when touchmove exceeds 20px in y-direction
         document.dispatchEvent(
             new KeyboardEvent("keydown", {
               code: 'Space'
@@ -51,6 +52,7 @@ function checkForJump() {
 }
 
 function moveOnMobile() {
+    touchStart();
     let relativeCharacterPosition = (character_x + characterWidth/2) / canvas.width;    // relative character-position on canvas
     let absoluteCharacterPosition = relativeCharacterPosition * $(window).width() ;     // absolute character-position on mobile screen 
     if (touchpointX < absoluteCharacterPosition) {  // move left if touch is placed left from character
@@ -60,15 +62,27 @@ function moveOnMobile() {
     } 
 }
 
-function ongoingTouchIndexById(idToFind) {
-    for (let i = 0; i < ongoingTouches.length; i++) {
-      let id = ongoingTouches[i].identifier;
-      
-      if (id == idToFind) {
-        return i;
-      }
+
+
+
+
+function touchStart() {
+    if (clickTimer == null) {
+        clickTimer = setTimeout(function () {
+            clickTimer = null;
+            // console.log("single");
+        }, 500)
+    } else {
+        clearTimeout(clickTimer);
+        clickTimer = null;
+        console.log("double");
+        document.dispatchEvent(
+            new KeyboardEvent("keydown", {
+              key: 'd'
+            })
+        ); 
+
     }
-    return -1;    // not found
-  } 
+}
 
 
