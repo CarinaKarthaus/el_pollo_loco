@@ -5,6 +5,7 @@
     ctx = canvas.getContext('2d');
     preloadImages();
     draw();
+    // calculatePosition(); // SetInterval stuff
  }
  function startGame() {
     // activate full game logic (collision checks, animation of enemies, key-listener etc.) when start-btn clicked

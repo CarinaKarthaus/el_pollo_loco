@@ -69,6 +69,9 @@ let currentTime = new Date().getTime();
 let timeSinceLastKeydown = 0;
 let updateIntervals = []; // array of interval-functions that are carried out
 
+// touch_processing.js variables
+
+
 
 
 // ----------- Game config

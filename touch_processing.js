@@ -1,10 +1,10 @@
 // Script for detecting finger touch on mobile devices
+
 let touchpointX;
 let Y_touchpoints = new Array();
 let ongoingTouches = new Array();
 let jumpOnMobile = false;
 let clickTimer = null;
-
 
 function startupMobileListeners() {
     document.addEventListener('touchstart', handleStart, false);
@@ -13,25 +13,26 @@ function startupMobileListeners() {
 }
 
 function handleStart(e) {
+    console.log('handleStart()');
     for (let i = 0; i < e.touches.length; i++) {
         if (e) {
             touchpointX = e.touches[i].pageX;
             touchpointY = e.touches[i].screenY;
-            // console.log('touchpointX: ' + touchpointX);  
-            // console.log('touchpointY: ', touchpointY);  
         } 
         moveOnMobile();
     }
 }
 
 function handleEnd() {
+    console.log('handleEnd()');
         isMovingLeft = false;    
         isMovingRight = false;
     } 
 
 function handleMove(e) {
+    console.log('handleMove()');
+
     for (let i = 0; i < e.touches.length; i++) {
-        // let idx = ongoingTouchIndexById(touches[i].identifier);
         let touchpointY = e.touches[i].pageY;
         Y_touchpoints.push(touchpointY);
     }
@@ -40,7 +41,6 @@ function handleMove(e) {
 
 function checkForJump() {
     let heightDifference = Y_touchpoints[0] - Y_touchpoints[Y_touchpoints.length -1];
-    // console.log(heightDifference);
 
     if (heightDifference >= 80) {       // trigger jump when touchmove exceeds 20px in y-direction
         document.dispatchEvent(
@@ -62,26 +62,19 @@ function moveOnMobile() {
     } 
 }
 
-
-
-
-
 function touchStart() {
     if (clickTimer == null) {
         clickTimer = setTimeout(function () {
             clickTimer = null;
-            // console.log("single");
         }, 500)
     } else {
         clearTimeout(clickTimer);
         clickTimer = null;
-        console.log("double");
         document.dispatchEvent(
             new KeyboardEvent("keydown", {
               key: 'd'
             })
         ); 
-
     }
 }
 
