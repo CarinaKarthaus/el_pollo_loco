@@ -5,8 +5,8 @@
     ctx = canvas.getContext('2d');
     preloadImages();
     draw();
-    // calculatePosition(); // SetInterval stuff
  }
+ 
  function startGame() {
     // activate full game logic (collision checks, animation of enemies, key-listener etc.) when start-btn clicked
     gameStarted = true;
@@ -90,16 +90,29 @@
             } else if (boss_energy < 60) {   // if boss_energy is reduced, he will attack
                 BOSS_POSITION_X -= 25;
             }
-        }, 60);
+            currentBossIndex++; 
+        }, 40);
         updateIntervals.push(updateBossInterval);
     }
 
+    /**
+     * Calculate boss-position when patrolling back and forth
+     */
     function calculatePatrollingBoss() {
+        bossPatrollingForward();
+        bossPatrollingBackward();
+    }
+
+    function bossPatrollingForward() {
         if (BOSS_POSITION_X > (6800) && !bossTurning) {
             BOSS_POSITION_X -= 5;
         } if (BOSS_POSITION_X <= (6800)) {
             bossTurning = true;
-        } if (BOSS_POSITION_X <= 7000 && bossTurning) {
+        }
+    }
+
+    function bossPatrollingBackward() {
+        if (BOSS_POSITION_X <= 7000 && bossTurning) {
             BOSS_POSITION_X += 5;  
         } if (BOSS_POSITION_X >= (7000)) {
             bossTurning = false;
@@ -110,6 +123,7 @@
   * Create and calculate character 
   */
     function calculateDrawingDetails() {
+        changeBossAnimations();
         checkCharacterMovement();
         calculateCloudOffset();
         calculateChickenPosition();
@@ -137,9 +151,11 @@
             }
     }
 
+    /**
+     * Check conditions for character-movements and animate if true
+     */
     function animateCharacter() {
         isJumping = (timePassedSinceJump < JUMP_TIME * 2) && !isWounded;
-        // Check conditions for character-movements and animate if true
         animateRunningCharacter();
         animateJumpingCharacter(isJumping);
         animateStandingCharacter(isJumping);
@@ -204,6 +220,7 @@
             lastJumpStarted = new Date().getTime();
         } 
     }
+
     function initiateBottleThrow(k) {
         if (k == 'd' && collectedBottles > 0) {
             let timePassed = new Date().getTime() - bottleThrowTime;
@@ -215,6 +232,7 @@
             }
         }
     }
+
     function checkKeyup() {
         document.addEventListener("keyup", e => {
             const k = e.key;

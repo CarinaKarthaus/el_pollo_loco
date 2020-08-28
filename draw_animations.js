@@ -1,61 +1,62 @@
 // Script to handle calculation and drawing of animations
 
-function draw() {
-    // DO NOT calculate anything here, just draw the canvas
-    // setInterval(function() {
+    function draw() {
         drawBackground();
         drawFinalBoss();
+        animateGameStartNFinish();
+        updateCharacter();
+        requestAnimationFrame(draw);
+    }
+
+    function animateGameStartNFinish() {
         if (gameFinished || isDead) {
             drawFinalScreens();
         }
-         else if (gameStarted) {
+        else if (gameStarted) {
             drawSideElements();
         }
-        updateCharacter();
-    // }, 100);
-   requestAnimationFrame(draw);
-}
+    }
 
-function drawSideElements() {
-    drawBars();
-    drawChicken();
-    drawBottles();
-    drawBottleThrow();
-}
+    function drawSideElements() {
+        drawBars();
+        drawChicken();
+        drawBottles();
+        drawBottleThrow();
+    }
 
 /**
  * Draw final screens for win or defeat
  */
 
-function drawFinalScreens() {
-    if (gameFinished) {
-        drawWinScreen();
-    } else if (isDead) {
-        drawDefeatScreen();
-    } 
-}
+    function drawFinalScreens() {
+        if (gameFinished) {
+            drawWinScreen();
+        } else if (isDead) {
+            drawDefeatScreen();
+        } 
+    }
 
-function drawWinScreen() {
-    prepareNotification();
-    ctx.fillText('Congrats!', canvas.width/2, 200);
-    ctx.fillText(' You won!', canvas.width/2, 300 );
-}
+    function drawWinScreen() {
+        prepareNotification();
+        ctx.fillText('Congrats!', canvas.width/2, 200);
+        ctx.fillText(' You won!', canvas.width/2, 300 );
+    }
 
-function drawDefeatScreen() {
-    prepareNotification();
-    ctx.fillText('Oh nooo!', canvas.width/2, 200);
-    ctx.fillText(' You lost!', canvas.width/2, 300 );
-}
-function prepareNotification() {
-    ctx.font = '90px Bradley Hand ITC';
-    ctx.fillStyle = 'black';
-    ctx.textAlign = 'center';
-}
+    function drawDefeatScreen() {
+        prepareNotification();
+        ctx.fillText('Oh nooo!', canvas.width/2, 200);
+        ctx.fillText(' You lost!', canvas.width/2, 300 );
+    }
+
+    function prepareNotification() {
+        ctx.font = '90px Bradley Hand ITC';
+        ctx.fillStyle = 'black';
+        ctx.textAlign = 'center';
+    }
 
 /**
  * Image cache 
  */
-
     function preloadImages(){
         for (let j = 0; j < allImgArrays.length; j++ ) {
             let currentArray = allImgArrays[j];
@@ -66,7 +67,8 @@ function prepareNotification() {
                 images.push(image); // push image-path to images-array (which contains all image-paths)
             }
         }
-} 
+    } 
+
     function checkBackgroundImageCache(src_path) {
         // Check if image is found in images-array
         base_image = images.find(function(img) {
@@ -122,19 +124,20 @@ function prepareNotification() {
  */
 
     function drawFinalBoss() {
-        let index;
-        changeBossAnimations(index);
+        // changeBossAnimations();
         addBackgroundObject(bossImgPath, BOSS_POSITION_X, BOSS_POSITION_Y, 0.4 , 0.9);
-        currentBossIndex++;     
     }
 
-    function changeBossAnimations(index){
+    function changeBossAnimations(){
         // Change boss-graphics depending on energy-level
-        animateWalkingBoss(index);
-        animateAttackingBoss(index);
-        animateWoundedBoss(index);
-        animateBossDefeat(index);
-    }
+        setInterval( function() {
+            let index;
+            animateWalkingBoss(index);
+            animateAttackingBoss(index);
+            animateWoundedBoss(index);
+            animateBossDefeat(index);    
+        }, 30)
+        }
     
     function animateWalkingBoss(index) {
         if (boss_energy == 100) {
@@ -142,12 +145,14 @@ function prepareNotification() {
             bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/1.Caminata/' + bossGraphicsWalking[index];
         } 
     }
+
     function animateWoundedBoss(index) {
         if (bossIsWounded) {
             index = currentBossIndex % bossGraphicsWounded.length;
             bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/3.Herida/' + bossGraphicsWounded[index];
         } 
     }
+
     function animateAttackingBoss(index) {
         if (boss_energy == 80) {
             index = currentBossIndex % bossGraphicsAngry.length;
@@ -157,6 +162,7 @@ function prepareNotification() {
             bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/2.Ateción-ataque/2.Ataque/' + bossGraphicsAttacking[index];
         }
     }
+
     function animateBossDefeat(index) {
         if (bossDefeatedAt > 0) {
             let timePassed = new Date().getTime() - bossDefeatedAt;
@@ -198,8 +204,10 @@ function prepareNotification() {
         drawFond();
     }
 
+    /**
+     * Draws background-elements according to level-length
+     */
     function drawFond() {
-        // creates background automatically 
         let currentFondIndex = 0;
         for (let i=-1; i < LEVEL_LENGTH; i++) {
             let index = currentFondIndex % fondImg.length;
@@ -212,6 +220,9 @@ function prepareNotification() {
         }
     }
 
+    /**
+     * Calculates movement of background when character is moving
+     */
     function calculateBgMovement() {
         if (isMovingRight) {
             bg_elements -= GAME_SPEED;
@@ -220,6 +231,9 @@ function prepareNotification() {
         }
     }
 
+    /** 
+     * Draws background-objects
+     */
     function addBackgroundObject(src_path, offsetX, offsetY, scaleX, scaleY, opacity){
         if (opacity) {
             ctx.globalAlpha = opacity;
@@ -231,6 +245,9 @@ function prepareNotification() {
         ctx.globalAlpha = 1;
     }
 
+    /**
+     * Calculates offset for moving clouds
+     */
     function calculateCloudOffset(){
         setInterval(function() {
             cloudOffset += 1;
@@ -249,6 +266,7 @@ function prepareNotification() {
             addBackgroundObject(bottleImg, bottle_x, bottle_y, 0.125, 0.225);
         }
     }
+
     function calculateBottleThrow(){
         let i = 0;
         setInterval(function(){
@@ -258,6 +276,7 @@ function prepareNotification() {
            }
         }, 40);
     }  
+
      function animateBottleThrow(i) {
         let timePassed = new Date().getTime() - bottleThrowTime;
         let gravity = Math.pow(9.81, timePassed / 300);
