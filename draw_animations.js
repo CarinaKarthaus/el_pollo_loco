@@ -1,7 +1,8 @@
 // Script to handle calculation and drawing of animations
 
 function draw() {
-    setInterval(function() {
+    // DO NOT calculate anything here, just draw the canvas
+    // setInterval(function() {
         drawBackground();
         drawFinalBoss();
         if (gameFinished || isDead) {
@@ -11,8 +12,8 @@ function draw() {
             drawSideElements();
         }
         updateCharacter();
-    }, 100);
-   //requestAnimationFrame(draw);
+    // }, 100);
+   requestAnimationFrame(draw);
 }
 
 function drawSideElements() {
@@ -255,7 +256,7 @@ function prepareNotification() {
                 animateBottleThrow(i);           
                 i++;
            }
-        }, 60);
+        }, 40);
     }  
      function animateBottleThrow(i) {
         let timePassed = new Date().getTime() - bottleThrowTime;

@@ -18,17 +18,18 @@
     <script src="./touch_processing.js"></script>
 </head>
 
-<body onload="init()">
-    <div id="safari-blocker-msg" class="d-none">
+<body onload="init(); isSafari()">
+    <div id="safari-blocker-msg" class="safari-blocker-msg d-none">
         <h2>Safari browser not supported</h2>
         <p>We're sorry, but Safari is not supported for El Pollo Loco.
             <br>
-            Please use Chrome instead!
+            Please copy the URL and use Chrome instead!
             <br>
             Thank you!
         </p>
-        <button class="btn btn-secondary" onclick="switchToChrome()">Open in Chrome</button>
+        <button class="btn btn-secondary" onclick="copyUrl(); clipboardMsg()">Copy URL</button>
     </div>
+    <div id="alarmmsg" class="alarmmsg"> </div>
     <div id='wrapper' class="wrapper">
         <div class="heading-box">
             <h1 id="heading">El Pollo Loco</h1>
@@ -42,7 +43,8 @@
             <button id="start-btn" class="btn btn-secondary" onclick="startGame()">Start!</button>
             <button id="restart-btn" class="btn btn-secondary d-none" onclick="window.location.reload()">Restart!</button>
         </div>
-        <div class="mobile-overlay" id="overlay"></div>  
+        <div class="mobile-overlay d-none" id="overlay"></div>  
+
 
     </div>
     <script src="./safari_blocker.js"></script>

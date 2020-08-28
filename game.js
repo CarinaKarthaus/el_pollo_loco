@@ -77,7 +77,7 @@
                 let chicken = chickens[i];
                 chicken.position_x -= chicken.speed; 
             }
-        }, 80);
+        }, 60);
         updateIntervals.push(updateChickenInterval);
     }
 
@@ -90,7 +90,7 @@
             } else if (boss_energy < 60) {   // if boss_energy is reduced, he will attack
                 BOSS_POSITION_X -= 25;
             }
-        }, 80);
+        }, 60);
         updateIntervals.push(updateBossInterval);
     }
 
@@ -123,7 +123,7 @@
             checkIfSleeping();
             animateCharacter();
             characterGraphicIndex++;
-        }, 50);
+        }, 40);
 
         updateIntervals.push(updateCharacterInterval);
     }

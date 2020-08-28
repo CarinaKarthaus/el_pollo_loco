@@ -13,7 +13,6 @@ function startupMobileListeners() {
 }
 
 function handleStart(e) {
-    console.log('handleStart()');
     for (let i = 0; i < e.touches.length; i++) {
         if (e) {
             touchpointX = e.touches[i].pageX;
@@ -24,13 +23,11 @@ function handleStart(e) {
 }
 
 function handleEnd() {
-    console.log('handleEnd()');
         isMovingLeft = false;    
         isMovingRight = false;
     } 
 
 function handleMove(e) {
-    console.log('handleMove()');
 
     for (let i = 0; i < e.touches.length; i++) {
         let touchpointY = e.touches[i].pageY;
