@@ -46,14 +46,14 @@ let characterDefeatedAt = 0;
 const fondImg = ['1.png', '2.png'];
 let cloudOffset = 0;
 const skyGraphics = [''];
-const chickenGraphics = ['1.Paso_derecho.png','1.Paso_derecho.png','1.Paso_derecho.png', '2.Centro.png', '2.Centro.png', '2.Centro.png', '3.Paso_izquierdo.png', '3.Paso_izquierdo.png', '3.Paso_izquierdo.png' ];
+const chickenGraphics = ['1.Paso_derecho.png','1.Paso_derecho.png','1.Paso_derecho.png','1.Paso_derecho.png','1.Paso_derecho.png', '2.Centro.png', '2.Centro.png','2.Centro.png', '2.Centro.png', '2.Centro.png', '3.Paso_izquierdo.png', '3.Paso_izquierdo.png','3.Paso_izquierdo.png', '3.Paso_izquierdo.png', '3.Paso_izquierdo.png' ];
 let currentChickenIndex = 0;
 const bottleGraphicsStatic = ['1.Marcador.png', '2.Botella_enterrada1.png', '2.Botella_enterrada2.png'];
 const bottleGraphicsRotating = ['botella_rotación1.png','botella_rotación2.png', 'botella_rotación3.png', 'botella_rotación4.png'];
-const bossGraphicsWalking = ['G1.png', 'G1.png', 'G2.png','G2.png', 'G3.png', 'G3.png', 'G4.png', 'G4.png' ];
-const bossGraphicsAngry = ['G5.png','G5.png','G6.png', 'G6.png', 'G7.png', 'G7.png', 'G8.png', 'G8.png', 'G9.png', 'G9.png', 'G10.png', 'G10.png', 'G11.png','G11.png','G12.png', 'G12.png' ];
-const bossGraphicsAttacking = ['G13.png','G13.png','G14.png', 'G14.png', 'G15.png', 'G15.png', 'G16.png', 'G16.png', 'G17.png', 'G17.png', 'G18.png', 'G18.png', 'G19.png','G19.png', 'G20.png', 'G20.png'];
-const bossGraphicsWounded = ['G21.png', 'G21.png', 'G22.png', 'G22.png','G23.png', 'G23.png'];
+const bossGraphicsWalking = ['G1.png', 'G1.png', 'G1.png', 'G2.png','G2.png','G2.png', 'G3.png', 'G3.png', 'G3.png', 'G4.png', 'G4.png', 'G4.png' ];
+const bossGraphicsAngry = ['G5.png','G5.png','G5.png', 'G6.png', 'G6.png', 'G6.png', 'G7.png', 'G7.png', 'G7.png', 'G8.png', 'G8.png', 'G8.png', 'G9.png', 'G9.png', 'G9.png', 'G10.png', 'G10.png', 'G10.png', 'G11.png','G11.png','G11.png', 'G12.png', 'G12.png', 'G12.png' ];
+const bossGraphicsAttacking = ['G13.png','G13.png','G13.png', 'G14.png', 'G14.png', 'G14.png', 'G15.png', 'G15.png', 'G15.png', 'G16.png', 'G16.png', 'G16.png', 'G17.png', 'G17.png', 'G17.png', 'G18.png', 'G18.png', 'G18.png', 'G19.png','G19.png','G19.png', 'G20.png', 'G20.png', 'G20.png'];
+const bossGraphicsWounded = ['G21.png', 'G21.png', 'G21.png','G22.png', 'G22.png', 'G22.png','G23.png', 'G23.png', 'G23.png'];
 const bossGraphicsDead = ['G24.png','G24.png','G24.png','G25.png','G25.png','G25.png','G26.png','G26.png','G26.png'];
 let currentBossIndex = 0;
 let bossImgPath = './img/4.Secuencias_Enemy_gigantón-Doña_Gallinota-/1.Caminata/G1.png';
@@ -70,14 +70,18 @@ let timeSinceLastKeydown = 0;
 let updateIntervals = []; // array of interval-functions that are carried out
 
 // touch_processing.js variables
-
+let touchpointX;
+let Y_touchpoints = new Array();
+let ongoingTouches = new Array();
+let jumpOnMobile = false;
+let clickTimer = null;
 
 
 
 // ----------- Game config
 const LEVEL_LENGTH = 8; // indicates how often canvas-length is repeated (canvas-length = 1080px)
 const JUMP_TIME = 450; // in ms
-const GAME_SPEED = 16;
+const GAME_SPEED = 14;
 const AUDIO_RUNNING = new Audio ('./audio/running.mp3');
 const AUDIO_JUMP = new Audio ('./audio/jump.mp3');
 const AUDIO_BOTTLE = new Audio ('./audio/bottle.mp3');

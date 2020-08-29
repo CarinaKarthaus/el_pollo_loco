@@ -7,14 +7,19 @@
     draw();
  }
  
+ /**
+  * Start game by activating full game logic, arranging UI etc. when start-btn clicked
+  */
  function startGame() {
-    // activate full game logic (collision checks, animation of enemies, key-listener etc.) when start-btn clicked
     gameStarted = true;
     AUDIO_BACKGROUND_MUSIC.play();
     runGameLogic();
     arrangeUI();
  }
 
+ /**
+  * Activate full game logic (collision checks, animation of enemies, key-listener etc.)
+  */
  function runGameLogic() {
     createChickenList();
     calculateDrawingDetails();
@@ -23,6 +28,9 @@
     moveOnMobile();
  }
 
+ /** 
+  * Arrange btns and remove overlays & instructions when game started
+  */
  function arrangeUI() {
     arrangeBtns();
     document.getElementById('heading').classList.add('h1-mobile'); //adapts for mobile-view
@@ -83,22 +91,29 @@
                 let chicken = chickens[i];
                 chicken.position_x -= chicken.speed; 
             }
-        }, 60);
+        }, 30);
         updateIntervals.push(updateChickenInterval);
     }
 
     function calculateBossPosition() {
         let updateBossInterval = setInterval( function() {
-            if (boss_energy == 100)  {      // if boss enery is intact, he is moving around his initial spot
-                calculatePatrollingBoss();
-            } else if (boss_energy < 100) {   // if boss_energy is reduced, he will attack
-                BOSS_POSITION_X -= 20;
-            } else if (boss_energy < 60) {   // if boss_energy is reduced, he will attack
-                BOSS_POSITION_X -= 25;
-            }
+            adaptBossMovements();
             currentBossIndex++; 
-        }, 60);
+        }, 30);
         updateIntervals.push(updateBossInterval);
+    }
+
+    /**
+     * Adapt boss movements according to energy level
+     */
+    function adaptBossMovements() {
+        if (boss_energy == 100)  {      // if boss enery is intact, he is moving around his initial spot
+            calculatePatrollingBoss();
+        } else if (boss_energy < 100) {   // if boss_energy is reduced, he will attack
+            BOSS_POSITION_X -= 20;
+        } else if (boss_energy < 60) {   // if boss_energy is reduced, he will attack
+            BOSS_POSITION_X -= 25;
+        }
     }
 
     /**
@@ -143,7 +158,7 @@
             checkIfSleeping();
             animateCharacter();
             characterGraphicIndex++;
-        }, 40);
+        }, 30);
 
         updateIntervals.push(updateCharacterInterval);
     }
@@ -163,9 +178,9 @@
     function animateCharacter() {
         isJumping = (timePassedSinceJump < JUMP_TIME * 2) && !isWounded;
         animateRunningCharacter();
-        animateJumpingCharacter(isJumping);
-        animateStandingCharacter(isJumping);
-        animateSleepingCharacter(isJumping);
+        animateJumpingCharacter();
+        animateStandingCharacter();
+        animateSleepingCharacter();
         animateWoundedCharacter();
         animateDeadCharacter();
         if (!isMovingLeft && !isMovingRight || isJumping) {
@@ -212,14 +227,16 @@
         if (k == 'ArrowLeft') {
             isMovingLeft = true;
         };
-        if (e.code == 'Space') {
+        if (e.code == 'Space' && timePassedSinceJump > JUMP_TIME * 2 && !isWounded) {
             characterGraphicIndex = 0;
             AUDIO_JUMP.play();
         }
     }
 
+    /**
+     * Prevent double-jumping or jumping when character is wounded
+     */
     function preventJumping(e) {
-        // prevent double-jumping or jumping when character is wounded
         timePassedSinceJump = new Date().getTime() - lastJumpStarted;
         let jumpingCondition = e.code == 'Space' && timePassedSinceJump > JUMP_TIME * 2 && !isWounded;
         if (jumpingCondition) { 
@@ -272,7 +289,7 @@
         AUDIO_BACKGROUND_MUSIC.pause();
         AUDIO_RUNNING.pause(); // pauses running audio when game over
         AUDIO_LOST.play();
-        setTimeout(refreshIntervals, 2000);
+        setTimeout(refreshIntervals, 3000);
     }
 
     function refreshIntervals() {

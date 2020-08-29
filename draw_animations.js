@@ -1,5 +1,8 @@
 // Script to handle calculation and drawing of animations
 
+    /**
+     * Draw elements to canvas
+     */
     function draw() {
         drawBackground();
         drawFinalBoss();
@@ -8,6 +11,9 @@
         requestAnimationFrame(draw);
     }
 
+    /**
+     * Draw side elements when game started or final screen if game finished/over
+     */
     function animateGameStartNFinish() {
         if (gameFinished || isDead) {
             drawFinalScreens();
@@ -57,6 +63,9 @@
 /**
  * Image cache 
  */
+    /**
+     * Preload all images 
+     */
     function preloadImages(){
         for (let j = 0; j < allImgArrays.length; j++ ) {
             let currentArray = allImgArrays[j];
@@ -90,8 +99,10 @@
         drawBottleBar();
     }
 
+    /**
+     * Draws energy bar for main character
+     */
     function drawCharacterEnergyBar() {
-        // draws energy bar for main character
         let energyBarPath = './img/7.Marcadores/Barra/Marcador vida/azul/' + character_energy + '_.png';
         if (character_energy <=0) {
             energyBarPath = './img/7.Marcadores/Barra/Marcador vida/azul/0_.png';
@@ -99,8 +110,10 @@
         addBackgroundObject( energyBarPath, 730 - bg_elements, 100, 0.3, 0.15, 0,6); 
      }
 
+     /**
+      * Draws energy bar for final boss enemy
+      */
      function drawBossEnergyBar() {
-        // draws energy bar for final boss enemy
         let energyBarPathBoss = './img/7.Marcadores/Barra/Marcador vida/naranja/' + boss_energy + '_.png';
         if (boss_energy <=0) {
             energyBarPathBoss = './img/7.Marcadores/Barra/Marcador vida/naranja/0_.png';
@@ -108,6 +121,9 @@
         addBackgroundObject( energyBarPathBoss, BOSS_POSITION_X + 50, 150, 0.2, 0.10, 0,6);
      }
 
+     /**
+      * Draws bar for collected bottles
+      */
      function drawBottleBar() {
         let bottleBarPath;
         if (collectedBottles <= 100) {
@@ -123,22 +139,26 @@
  * Draw & animate enemies
  */
 
+     /**
+      * Draw final boss to canvas
+      */
     function drawFinalBoss() {
-        changeBossAnimations();
+        let index;
+        changeBossAnimations(index);
         addBackgroundObject(bossImgPath, BOSS_POSITION_X, BOSS_POSITION_Y, 0.4 , 0.9);
+        currentBossIndex++;     
     }
 
-    function changeBossAnimations(){
-        // Change boss-graphics depending on energy-level
-        setInterval( function() {
-            let index;
-            animateWalkingBoss(index);
-            animateAttackingBoss(index);
-            animateWoundedBoss(index);
-            animateBossDefeat(index);    
-        }, 70)
-        }
-    
+    /**
+     * Change boss-graphics depending on energy-level
+     */
+    function changeBossAnimations(index){
+        animateWalkingBoss(index);
+        animateAttackingBoss(index);
+        animateWoundedBoss(index);
+        animateBossDefeat(index);
+    }
+  
     function animateWalkingBoss(index) {
         if (boss_energy == 100) {
             index = currentBossIndex % bossGraphicsWalking.length;
@@ -163,6 +183,9 @@
         }
     }
 
+    /**
+     * Animate death of final boss
+     */
     function animateBossDefeat(index) {
         if (bossDefeatedAt > 0) {
             let timePassed = new Date().getTime() - bossDefeatedAt;
@@ -178,14 +201,22 @@
             let index = currentChickenIndex % chickenGraphics.length;
             let chicken = chickens[k];
             let chickenDead = chicken.isHurt;
-            if(!chickenDead) {      // draw walking chicken, if not dead
-                addBackgroundObject(chicken.img_path + chickenGraphics[index], chicken.position_x, chicken.position_y, chicken.scale_x ,chicken.scale_y);
-            } else {    // draw dead chicken on last x-position recognized
-                chicken.speed = 0;
-                addBackgroundObject(chicken.img_path + '4.Muerte.png', chicken.position_x, chicken.position_y, chicken.scale_x ,chicken.scale_y);
-            }
+            animateChickenState(index, chicken, chickenDead);
+            
             currentChickenIndex++;
         }   
+    }
+
+    /**
+     * Check if chicken is alive or dead and animate accordingly
+     */
+    function animateChickenState(index, chicken, chickenDead) {
+        if(!chickenDead) {      // draw walking chicken, if not dead
+            addBackgroundObject(chicken.img_path + chickenGraphics[index], chicken.position_x, chicken.position_y, chicken.scale_x ,chicken.scale_y);
+        } else {    // draw dead chicken on last x-position recognized
+            chicken.speed = 0;
+            addBackgroundObject(chicken.img_path + '4.Muerte.png', chicken.position_x, chicken.position_y, chicken.scale_x ,chicken.scale_y);
+        }
     }
 
 /** 
@@ -205,7 +236,7 @@
     }
 
     /**
-     * Draws background-elements according to level-length
+     * Draw background-elements according to level-length
      */
     function drawFond() {
         let currentFondIndex = 0;
@@ -232,13 +263,17 @@
     }
 
     /** 
-     * Draws background-objects
+     * Check img-cache and draw background-objects to canvas
      */
     function addBackgroundObject(src_path, offsetX, offsetY, scaleX, scaleY, opacity){
         if (opacity) {
             ctx.globalAlpha = opacity;
         }    
         checkBackgroundImageCache(src_path);
+        drawBgImgsToCanvas(offsetX,offsetY, scaleX, scaleY);
+    }
+
+    function drawBgImgsToCanvas(offsetX,offsetY, scaleX, scaleY) {
         if (base_image.complete) {
             ctx.drawImage(base_image, offsetX + bg_elements, -100 + offsetY, (canvas.width +1) * scaleX , canvas.height * scaleY);
         };
@@ -290,5 +325,3 @@
      function drawBottleThrow() { 
         ctx.drawImage(bottle_base_image, thrownBottleX, thrownBottleY, bottle_base_image.width * 0.3, bottle_base_image.height *  0.25);
      }
-
-  

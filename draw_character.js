@@ -1,7 +1,9 @@
 /**
  * Main file to draw and animate character movements
  */
-
+    /**
+     * Updates current position and image on canvas
+     */
     function updateCharacter(){
         checkImageCache(); // check if character images are preloaded in cache 
         let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
@@ -25,7 +27,9 @@
             character_image.src = currentCharacterImg ;
         }
     }
-
+    /**
+     * Draws character on canvas 
+     */
     function drawCharacter() {
         characterHeight = character_image.height *  0.35;
         characterWidth = character_image.width * 0.35;
@@ -37,51 +41,68 @@
         requestAnimationFrame(drawCharacter);
     }
 
+    /**
+     * Flip character img horizontally when moving left
+     */
     function flipCharacterImage() {
-        // flip character img horizontally when moving left
         ctx.save();
         ctx.translate(character_image.width -60, 0);
         ctx.scale(-1,1);
     }
-
+    /**
+     * Change graphics and sound for running character
+     */
     function animateRunningCharacter(){
-        // Change graphics and sound for running character
         if (isMovingRight || isMovingLeft) {
             AUDIO_RUNNING.play(); // plays audio when moving
             let index = characterGraphicIndex % characterGraphicsMoving.length;
             currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/2.Secuencia_caminata/' + characterGraphicsMoving[index];
         }
     } 
-    function animateJumpingCharacter(isJumping) {
-        // Change graphics for jumping character
+
+    /**
+     * Change graphics for jumping character
+     */
+    function animateJumpingCharacter() {
         if (isJumping) { // Pepe is jumping
             let index = characterGraphicIndex % characterGraphicsJumping.length;
             currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/3.Secuencia_salto/' + characterGraphicsJumping[index];
         }
     }
-    function animateStandingCharacter(isJumping) {
-        // Change graphics for standing character
+
+    /**
+     * Change graphics for standing character
+     */
+    function animateStandingCharacter() {
         if (!isMovingLeft && !isMovingRight && !isJumping) {
             let index = characterGraphicIndex % characterGraphicsStanding.length;
             currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/IDLE/' + characterGraphicsStanding[index];
         }    
     }
-    function animateSleepingCharacter(isJumping) {
-        //changes graphics for sleeping character (after inactivity)
+
+    /**
+     * Changes graphics for sleeping character (after inactivity)
+     */
+    function animateSleepingCharacter() {
         if (isSleeping && !isMovingLeft && !isMovingRight && !isJumping) {
             let index = characterGraphicIndex % characterGraphicsSleeping.length;
             currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/1.IDLE/LONG_IDLE/' + characterGraphicsSleeping[index];
         }
     }
+
+    /**
+     * Change graphics for wounded character
+     */
     function animateWoundedCharacter() {
-        // Change graphics for wounded character
         if (isWounded) {
             let index = characterGraphicIndex % characterGraphicsWounded.length;
             currentCharacterImg = './img/2.Secuencias_Personaje-Pepe-corrección/4.Herido/' + characterGraphicsWounded[index];
         }    
     }
+    /**
+     * Changes graphics when character dies
+     */
     function animateDeadCharacter() {
-        // changes graphics when character dies
         if (isDead) {
             let timePassed = new Date().getTime() - characterDefeatedAt;
             character_x -= timePassed / 20;
