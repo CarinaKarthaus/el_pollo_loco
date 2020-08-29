@@ -83,7 +83,7 @@
                 let chicken = chickens[i];
                 chicken.position_x -= chicken.speed; 
             }
-        }, 40);
+        }, 60);
         updateIntervals.push(updateChickenInterval);
     }
 
