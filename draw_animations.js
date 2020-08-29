@@ -124,7 +124,7 @@
  */
 
     function drawFinalBoss() {
-        // changeBossAnimations();
+        changeBossAnimations();
         addBackgroundObject(bossImgPath, BOSS_POSITION_X, BOSS_POSITION_Y, 0.4 , 0.9);
     }
 
@@ -136,7 +136,7 @@
             animateAttackingBoss(index);
             animateWoundedBoss(index);
             animateBossDefeat(index);    
-        }, 30)
+        }, 70)
         }
     
     function animateWalkingBoss(index) {
@@ -274,7 +274,7 @@
                 animateBottleThrow(i);           
                 i++;
            }
-        }, 40);
+        }, 50);
     }  
 
      function animateBottleThrow(i) {

@@ -24,11 +24,17 @@
  }
 
  function arrangeUI() {
+    arrangeBtns();
+    document.getElementById('heading').classList.add('h1-mobile'); //adapts for mobile-view
+    document.getElementById('overlay').classList.add('d-none'); // removes overlay
+    document.getElementById('instructions').classList.add('d-none');    // removes command-instructions
+    document.getElementById('mobile-instructions').classList.add('d-none');
+ }
+
+ function arrangeBtns() {
     document.getElementById('restart-btn').classList.remove('d-none'); // makes restart btn visible
     document.getElementById('start-btn').classList.add('d-none'); // hides start-btn 
     document.getElementById('restart-btn').classList.add('restart-btn-mobile'); //adapts btn for mobile-view
-    document.getElementById('heading').classList.add('h1-mobile'); //adapts for mobile-view
-    document.getElementById('overlay').classList.add('d-none'); // removes overlay
     document.getElementById('btn-box').classList.add('btn-box-mobile'); //adapts for mobile-view
  }
 
@@ -77,7 +83,7 @@
                 let chicken = chickens[i];
                 chicken.position_x -= chicken.speed; 
             }
-        }, 60);
+        }, 40);
         updateIntervals.push(updateChickenInterval);
     }
 
@@ -91,7 +97,7 @@
                 BOSS_POSITION_X -= 25;
             }
             currentBossIndex++; 
-        }, 40);
+        }, 60);
         updateIntervals.push(updateBossInterval);
     }
 
@@ -123,11 +129,11 @@
   * Create and calculate character 
   */
     function calculateDrawingDetails() {
-        changeBossAnimations();
         checkCharacterMovement();
         calculateCloudOffset();
         calculateChickenPosition();
         calculateBottleThrow();
+        changeBossAnimations();
         calculateBossPosition();
     }
 
