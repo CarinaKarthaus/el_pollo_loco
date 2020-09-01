@@ -44,9 +44,22 @@
     document.getElementById('start-btn').classList.add('d-none'); // hides start-btn 
     document.getElementById('restart-btn').classList.add('restart-btn-mobile'); //adapts btn for mobile-view
     document.getElementById('btn-box').classList.add('btn-box-mobile'); //adapts for mobile-view
+    document.getElementById('fullscreen-btn').classList.remove('d-none'); // makes fullscreen-btn visible
  }
 
- 
+function openFullscreen() {
+    if (canvas.requestFullscreen) {
+        canvas.requestFullscreen();
+    } else if (canvas.mozRequestFullScreen) { /* Firefox */
+        canvas.mozRequestFullScreen();
+    } else if (canvas.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+        canvas.webkitRequestFullscreen();
+    } else if (canvas.msRequestFullscreen) { /* IE/Edge */
+        canvas.msRequestFullscreen();
+    }
+}
+
+
 /**
  * Create and calculate enemies
  */
@@ -292,8 +305,10 @@
         setTimeout(refreshIntervals, 3000);
     }
 
+    /**
+     * Clears intervals for collision detection etc. to stop them when game is finished/over
+     */
     function refreshIntervals() {
-        // Clears intervals for collision detection etc. to stop them when game is finished/over
         updateIntervals.forEach((interval) => {
             clearInterval(interval)
         });

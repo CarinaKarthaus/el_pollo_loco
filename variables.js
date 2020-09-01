@@ -77,7 +77,6 @@ let jumpOnMobile = false;
 let clickTimer = null;
 
 
-
 // ----------- Game config
 const LEVEL_LENGTH = 8; // indicates how often canvas-length is repeated (canvas-length = 1080px)
 const JUMP_TIME = 450; // in ms

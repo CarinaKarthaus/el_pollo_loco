@@ -57,6 +57,7 @@
             AUDIO_PAIN.play();
         }
     }
+    
     /**
      * Reduce boss energy and trigger wounded- or levelFinish-animation
      */
@@ -71,8 +72,6 @@
             finishLevel();
         }
     }
-
-
 
     function checkChickenCollision() {
         timeSinceLastCollision = new Date().getTime() - timeOfCollision;

@@ -134,11 +134,9 @@
         addBackgroundObject( bottleBarPath, 25 - bg_elements, 100, 0.3, 0.15, 0,6);
      }
 
-
 /**
  * Draw & animate enemies
  */
-
      /**
       * Draw final boss to canvas
       */
