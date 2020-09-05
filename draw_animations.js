@@ -54,6 +54,9 @@
         ctx.fillText(' You lost!', canvas.width/2, 300 );
     }
 
+    /**
+     * Prepares styles for screen-notification when game is won / over
+     */
     function prepareNotification() {
         ctx.font = '90px Bradley Hand ITC';
         ctx.fillStyle = 'black';
@@ -78,6 +81,10 @@
         }
     } 
 
+    /**
+     * Check if background-image is already loaded in cache; if not, create new image
+     * @param {string} src_path - scr-path of background-image 
+     */
     function checkBackgroundImageCache(src_path) {
         // Check if image is found in images-array
         base_image = images.find(function(img) {
@@ -141,22 +148,26 @@
       * Draw final boss to canvas
       */
     function drawFinalBoss() {
-        let index;
-        changeBossAnimations(index);
+        changeBossAnimations();
         addBackgroundObject(bossImgPath, BOSS_POSITION_X, BOSS_POSITION_Y, 0.4 , 0.9);
         currentBossIndex++;     
     }
 
     /**
-     * Change boss-graphics depending on energy-level
+     * Change boss-graphics depending on his energy-level
      */
-    function changeBossAnimations(index){
+    function changeBossAnimations(){
+        let index;
         animateWalkingBoss(index);
         animateAttackingBoss(index);
         animateWoundedBoss(index);
         animateBossDefeat(index);
     }
   
+    /**
+     * Animate boss-graphics in walking mode if boss is not hurt yet    
+     * @param {number} index - index of current boss-graphic
+     */
     function animateWalkingBoss(index) {
         if (boss_energy == 100) {
             index = currentBossIndex % bossGraphicsWalking.length;
@@ -164,6 +175,10 @@
         } 
     }
 
+    /**
+     * Animate boss-graphics in hurt-mode if boss just got hurt
+     * @param {number} index - index of current boss-graphic
+     */
     function animateWoundedBoss(index) {
         if (bossIsWounded) {
             index = currentBossIndex % bossGraphicsWounded.length;
@@ -171,6 +186,10 @@
         } 
     }
 
+    /**
+     * Animate boss-graphics in angry or attacking-mode if boss-energy is <= 80
+     * @param {number} index - index of current boss-graphic 
+     */
     function animateAttackingBoss(index) {
         if (boss_energy == 80) {
             index = currentBossIndex % bossGraphicsAngry.length;
@@ -183,6 +202,7 @@
 
     /**
      * Animate death of final boss
+     * @param {number} index - index of current boss-graphic 
      */
     function animateBossDefeat(index) {
         if (bossDefeatedAt > 0) {
@@ -194,6 +214,9 @@
         }
     }
 
+    /**
+     * Draws chicken to canvas
+     */
     function drawChicken() {
         for (let k = 0; k < chickens.length; k++) {
             let index = currentChickenIndex % chickenGraphics.length;
@@ -207,6 +230,9 @@
 
     /**
      * Check if chicken is alive or dead and animate accordingly
+     * @param {number} index - index of current chicken-graphic
+     * @param {object} chicken - JSON-object of chicken
+     * @param {boolean} chickenDead - indicates if chicken is dead
      */
     function animateChickenState(index, chicken, chickenDead) {
         if(!chickenDead) {      // draw walking chicken, if not dead
@@ -227,6 +253,7 @@
     }
 
     function drawGround() {
+        // if character not dead, background can move
         if (!isDead) {
             calculateBgMovement();
         }
@@ -260,8 +287,14 @@
         }
     }
 
-    /** 
+    /**
      * Check img-cache and draw background-objects to canvas
+     * @param {string} src_path - src-path of background-image 
+     * @param {number} offsetX - x-position of bg-object on canvas
+     * @param {number} offsetY - y-position of bg-object on canvas
+     * @param {number} scaleX - x-scaling-factor of bg-object
+     * @param {number} scaleY - y-scaling-factor of bg-object
+     * @param {number} opacity - opacity of bg-object
      */
     function addBackgroundObject(src_path, offsetX, offsetY, scaleX, scaleY, opacity){
         if (opacity) {
@@ -271,6 +304,13 @@
         drawBgImgsToCanvas(offsetX,offsetY, scaleX, scaleY);
     }
 
+    /**
+     * 
+     * @param {number} offsetX - x-position of bg-object on canvas
+     * @param {number} offsetY - y-position of bg-object on canvas
+     * @param {number} scaleX - x-scaling-factor of bg-object
+     * @param {number} scaleY - y-scaling-factor of bg-object
+     */
     function drawBgImgsToCanvas(offsetX,offsetY, scaleX, scaleY) {
         if (base_image.complete) {
             ctx.drawImage(base_image, offsetX + bg_elements, -100 + offsetY, (canvas.width +1) * scaleX , canvas.height * scaleY);
@@ -310,6 +350,10 @@
         }, 50);
     }  
 
+    /**
+     * Calculate position data and updates graphics for bottle-throw
+     * @param {number} i - index of rotating-bottle-graphic
+     */
      function animateBottleThrow(i) {
         let timePassed = new Date().getTime() - bottleThrowTime;
         let gravity = Math.pow(9.81, timePassed / 300);
@@ -319,7 +363,9 @@
         let index = i % bottleGraphicsRotating.length;
         bottle_base_image.src = './img/6.botella/Rotación/' + bottleGraphicsRotating[index];    // changes bottle-img to animate rotation
     }
-    
+    /**
+     * Draw thrown, rotating bottle on canvas
+     */
      function drawBottleThrow() { 
         ctx.drawImage(bottle_base_image, thrownBottleX, thrownBottleY, bottle_base_image.width * 0.3, bottle_base_image.height *  0.25);
      }

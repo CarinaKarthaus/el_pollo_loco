@@ -8,6 +8,10 @@ function startupMobileListeners() {
     document.addEventListener('touchmove', handleMove, false);
 }
 
+/**
+ * Detect and handle touch-start on mobile
+ * @param {string} e - touch event 
+ */
 function handleStart(e) {
     for (let i = 0; i < e.touches.length; i++) {
         if (e) {
@@ -18,11 +22,18 @@ function handleStart(e) {
     }
 }
 
+/**
+ * Stop character-movement when touch ended
+ */
 function handleEnd() {
         isMovingLeft = false;    
         isMovingRight = false;
-    } 
+} 
 
+/**
+ * Detect and handle touch-move on mobile
+ * @param {string} e - touch event
+ */
 function handleMove(e) {
     for (let i = 0; i < e.touches.length; i++) {
         let touchpointY = e.touches[i].pageY;
@@ -34,11 +45,14 @@ function handleMove(e) {
 function checkForJump() {
     let heightDifference = Y_touchpoints[0] - Y_touchpoints[Y_touchpoints.length -1];
 
-    if (heightDifference >= 80 && !isWounded) {       // trigger jump when touchmove exceeds 80px in y-direction and character isn't wounded
+    // trigger jump when touchmove exceeds 80px in y-direction and character isn't wounded
+    if (heightDifference >= 80 && !isWounded) {       
         triggerJump();
     }
 }
-
+/**
+ * Simulate keydown-event when jump is triggered on mobile
+ */
 function triggerJump() {
     document.dispatchEvent(
         new KeyboardEvent("keydown", {
@@ -57,6 +71,10 @@ function moveOnMobile() {
     detectMovingDirection(absoluteCharacterPosition);
 }
 
+/**
+ * Detect moving direction of character depending on point of touch on screen
+ * @param {number} absoluteCharacterPosition - x-position of character on current screen in px
+ */
 function detectMovingDirection(absoluteCharacterPosition) {
     if (touchpointX < absoluteCharacterPosition) {  // move left if touch is placed left from character
         isMovingLeft = true;

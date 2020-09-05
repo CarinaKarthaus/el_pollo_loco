@@ -28,6 +28,15 @@
     moveOnMobile();
  }
 
+ function calculateDrawingDetails() {
+    checkCharacterMovement();
+    calculateCloudOffset();
+    calculateChickenPosition();
+    calculateBottleThrow();
+    changeBossAnimations();
+    calculateBossPosition();
+}
+
  /** 
   * Arrange btns and remove overlays & instructions when game started
   */
@@ -47,6 +56,9 @@
     document.getElementById('fullscreen-btn').classList.remove('d-none'); // makes fullscreen-btn visible
  }
 
+ /**
+  * Open fullscreen (available for various browsers)
+  */
 function openFullscreen() {
     if (canvas.requestFullscreen) {
         canvas.requestFullscreen();
@@ -59,11 +71,15 @@ function openFullscreen() {
     }
 }
 
-
 /**
  * Create and calculate enemies
  */
 
+    /**
+     * Create JSON-object for chicken-enemy
+     * @param {string} imgPath - img-path defining the chicken-type
+     * @param {number} position_x - initial x-position of the chicken
+     */
     function createChicken(imgPath, position_x) {
         return {
             'img_path':     imgPath,
@@ -156,14 +172,6 @@ function openFullscreen() {
  /**
   * Create and calculate character 
   */
-    function calculateDrawingDetails() {
-        checkCharacterMovement();
-        calculateCloudOffset();
-        calculateChickenPosition();
-        calculateBottleThrow();
-        changeBossAnimations();
-        calculateBossPosition();
-    }
 
     function checkCharacterMovement() {  
         let updateCharacterInterval = setInterval(function() {
@@ -175,7 +183,9 @@ function openFullscreen() {
 
         updateIntervals.push(updateCharacterInterval);
     }
-
+    /**
+     * Put character in sleeping-mode when player is inactive
+     */
     function checkIfSleeping() {
         currentTime = new Date().getTime();
             if ((currentTime - timeSinceLastKeydown) > 5000) {
@@ -201,6 +211,10 @@ function openFullscreen() {
         }
     }
 
+    /**
+     * Calculates y-position of character during jump
+     * @param {number} timePassedSinceJump - time that passed since last jump has started
+     */
     function calculateJumpingSequence(timePassedSinceJump) {
         if (timePassedSinceJump < JUMP_TIME) {
             // character rises until max. duration of JUMP_TIME is reached
@@ -212,7 +226,7 @@ function openFullscreen() {
     }
 
 /**
- * Check player commands 
+ * Check player commands given through keys & touch
  */
     function listenForKeys() {
         startupMobileListeners();
@@ -226,13 +240,22 @@ function openFullscreen() {
         checkKeyup(); 
     }
 
+    /**
+     * Save time of last keydown to detect inactivity
+     * @param {string} k - keydown detected by listener
+     * @param {string} e - keydown-event detected by listener
+     */
     function saveKeydownTime(k, e) {
-        // save time of last keydown to detect inactivity
         if (k || e.code) {
             timeSinceLastKeydown = new Date().getTime();        
         }
     }
 
+    /**
+     * Check for pressed keys to trigger movement and jumping
+     * @param {string} k - keydown detected by listener
+     * @param {string} e - keydown-event detected by listener
+     */
     function checkKeydown(k, e) {
         if (k == 'ArrowRight') {
             isMovingRight = true;
@@ -248,6 +271,7 @@ function openFullscreen() {
 
     /**
      * Prevent double-jumping or jumping when character is wounded
+     * @param {string} e - keydown-event detected by listener
      */
     function preventJumping(e) {
         timePassedSinceJump = new Date().getTime() - lastJumpStarted;
@@ -257,6 +281,10 @@ function openFullscreen() {
         } 
     }
 
+    /**
+     * Initiate animations & calculations for bottle-throw
+     * @param {string} k - keydown detected by listener
+     */
     function initiateBottleThrow(k) {
         if (k == 'd' && collectedBottles > 0) {
             let timePassed = new Date().getTime() - bottleThrowTime;
@@ -269,6 +297,9 @@ function openFullscreen() {
         }
     }
 
+    /**
+     * Check for keyup and stop character-movement accordingly
+     */
     function checkKeyup() {
         document.addEventListener("keyup", e => {
             const k = e.key;

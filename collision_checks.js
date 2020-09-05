@@ -16,7 +16,16 @@
     }
 
     /**
-     * General function to check if collision has happened according to x- & y-coordinates
+     * General function to check if collision has happened between two elements according to x- & y-coordinates
+     * 
+     * @param {number} collider_1_x - x-coordinate of the 1st collision element
+     * @param {number} collider_1_width - width of the 1st collision element 
+     * @param {number} collider_2_x - x-coordinate of the 2nd collision element
+     * @param {number} collider_2_width - width of the 2nd collision element 
+     * @param {number} collider_1_y - Y-coordinate of the 1st collision element
+     * @param {number} collider_1_height - height of the 1st collision element 
+     * @param {number} collider_2_y y-coordinate of the 2nd collision element
+     * @param {number} collider_2_height - height of the 2nd collision element 
      */
     function checkCollisionCondition(collider_1_x, collider_1_width, collider_2_x, collider_2_width, collider_1_y, collider_1_height, collider_2_y, collider_2_height) {
         // defines range for x-position in which collision is detected
@@ -39,7 +48,9 @@
             hurtBossAnimation();
         }
     } 
-
+    /**
+     * Trigger actions when final boss is hurt
+     */
     function hurtBossAnimation(){
         timeOfBottleCollision = new Date().getTime();
         AUDIO_BREAKING_BOTTLE.play();
@@ -73,6 +84,9 @@
         }
     }
 
+    /**
+     * Checks if character has collided with chicken, who got hurt 
+     */
     function checkChickenCollision() {
         timeSinceLastCollision = new Date().getTime() - timeOfCollision;
         if (timeSinceLastCollision > DURATION_WOUNDED_STATE) {    // wounded state prevents from jumping and triggers wounded-animation
@@ -95,6 +109,8 @@
 
     /**
      * Character energy reduced if he collides with enemy AND enough time has passed since last collision
+     * @param {boolean} chickenDeath - indicates if chicken is dead
+     * @param {boolean} collisionTrue - indicates if collision has happened
      */
     function verifyCharacterWounded(chickenDeath, collisionTrue) {
         if (!chickenDeath && (timeSinceLastCollision > DURATION_WOUNDED_STATE) && collisionTrue) {         
@@ -107,6 +123,7 @@
 
     /**
      * Check if character and chicken have collided
+     * @param {number} i - index of chicken for which collision is checked
      */
     function verifyChickenCollision(i) {
         let chicken = chickens[i];
@@ -120,6 +137,8 @@
 
     /**
      * Chicken killed if character jumps on it
+     * @param {number} i - index of chicken 
+     * @param {boolean} collisionTrue - indicates if collision has happened between character and chicken
      */
     function verifyChickenDeath(i, collisionTrue) {
         if (isJumping && collisionTrue) {
@@ -155,6 +174,7 @@
 
     /**
      * Trigger sounds, remove bottle from visible canvas and add it to bottle-bar
+     * @param {number} i - index of picked bottle in placedBottles-array
      */
     function pickBottle(i) {
         placedBottles[i] = -2000; // moves bottle outside of visible canvas when picked

@@ -42,16 +42,17 @@ function clipboardMsg() {
 
 /**
  * Let's clipboard message fade out 
+ * @param {object} msg - HTML-element of the alarm-message  
  */
-function fadeOut(element) {
+function fadeOut(msg) {
     let op = 1;  // initial opacity
     let timer = setInterval(function () {
         if (op <= 0.1){
             clearInterval(timer);
-            element.style.display = 'none';
+            msg.style.display = 'none';
         }
-        element.style.opacity = op;
-        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+        msg.style.opacity = op;
+        msg.style.filter = 'alpha(opacity=' + op * 100 + ")";
         op -= op * 0.2;
     }, 50);
 }
