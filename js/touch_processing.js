@@ -14,15 +14,29 @@ function startupMobileListeners() {
  * @param {string} e - touch event 
  */
 function handleStart(e) {
-    document.documentElement.requestFullscreen();
+    // document.documentElement.requestFullscreen();
     for (let i = 0; i < e.touches.length; i++) {
-        if (e) {
-            touchpointX = e.touches[i].pageX;
-            touchpointY = e.touches[i].screenY;
-        } 
+        if (e && window.innerWidth > 450 ) {
+            touchpointX = e.touches[i].clientX;
+            touchpointY = e.touches[i].clientY;
+        } else {
+            changeTouchpointRef(e)
+        }
         moveOnMobile();
     }
 }
+
+/**
+ * Change reference for x- and y-axis
+ * @param {string} e - touch event
+ */
+function changeTouchpointRef(e) {
+    // reference points for x and y-movement on canvas are flipped on small screens due to forced canvas rotation by 90deg
+    // touchpoint-references need to be flipped in portrait-view 
+    touchpointX = e.touches[i].clientY;
+    touchpointY = e.touches[i].clientX;
+}
+
 
 /**
  * Stop character-movement when touch ended
@@ -48,7 +62,7 @@ function checkForJump() {
     let heightDifference = Y_touchpoints[0] - Y_touchpoints[Y_touchpoints.length -1];
 
     // trigger jump when touchmove exceeds 80px in y-direction and character isn't wounded
-    if (heightDifference >= 80 && !isWounded) {       
+    if (heightDifference >= 80 ) {       
         triggerJump();
     }
 }
@@ -108,19 +122,19 @@ function detectDoubleTap() {
     ); 
 }
 
-function toggleFullScreen() {
-    let doc = window.document;
-    let docEl = doc.documentElement;
+// function toggleFullScreen() {
+//     let doc = window.document;
+//     let docEl = doc.documentElement;
   
-    let requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
-    let cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+//     let requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+//     let cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
   
-    if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
-      requestFullScreen.call(docEl);
-    }
-    else {
-      cancelFullScreen.call(doc);
-    }
-  }
+//     if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+//       requestFullScreen.call(docEl);
+//     }
+//     else {
+//       cancelFullScreen.call(doc);
+//     }
+//   }
 
 

@@ -131,7 +131,7 @@ function openFullscreen() {
         let updateBossInterval = setInterval( function() {
             adaptBossMovements();
             currentBossIndex++; 
-        }, 30);
+        }, 50);
         updateIntervals.push(updateBossInterval);
     }
 
@@ -323,7 +323,7 @@ function openFullscreen() {
         AUDIO_BACKGROUND_MUSIC.pause();
         setTimeout(function() {
             AUDIO_WIN.play();
-        }, 1200);
+        }, 1000);
         gameFinished = true;
         gameStarted = false;
 

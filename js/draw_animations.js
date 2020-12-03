@@ -347,7 +347,7 @@
                 animateBottleThrow(i);           
                 i++;
            }
-        }, 50);
+        }, 30);
     }  
 
     /**
