@@ -58,7 +58,7 @@
      * Prepares styles for screen-notification when game is won / over
      */
     function prepareNotification() {
-        ctx.font = '90px Bradley Hand ITC';
+        ctx.font = '90px Architects Daughter';
         ctx.fillStyle = 'black';
         ctx.textAlign = 'center';
     }
@@ -83,7 +83,7 @@
 
     /**
      * Check if background-image is already loaded in cache; if not, create new image
-     * @param {string} src_path - scr-path of background-image 
+     * @param {string} src_path - src-path of background-image 
      */
     function checkBackgroundImageCache(src_path) {
         // Check if image is found in images-array
@@ -254,7 +254,7 @@
 
     function drawGround() {
         // if character not dead, background can move
-        if (!isDead) {
+        if (!isDead && !gameFinished) {
             calculateBgMovement();
         }
         drawFond();
@@ -301,7 +301,7 @@
             ctx.globalAlpha = opacity;
         }    
         checkBackgroundImageCache(src_path);
-        drawBgImgsToCanvas(offsetX,offsetY, scaleX, scaleY);
+        drawBgImgsToCanvas(offsetX, offsetY, scaleX, scaleY);
     }
 
     /**

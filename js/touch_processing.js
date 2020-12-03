@@ -2,6 +2,7 @@
  * Script for detecting finger touch on mobile devices
  */ 
 
+
 function startupMobileListeners() {
     document.addEventListener('touchstart', handleStart, false);
     document.addEventListener('touchend', handleEnd, false);
@@ -9,10 +10,11 @@ function startupMobileListeners() {
 }
 
 /**
- * Detect and handle touch-start on mobile
+ * Detect and handle touch-start on mobile; open fullscreen when user touch detected
  * @param {string} e - touch event 
  */
 function handleStart(e) {
+    document.documentElement.requestFullscreen();
     for (let i = 0; i < e.touches.length; i++) {
         if (e) {
             touchpointX = e.touches[i].pageX;
@@ -105,5 +107,20 @@ function detectDoubleTap() {
         })
     ); 
 }
+
+function toggleFullScreen() {
+    let doc = window.document;
+    let docEl = doc.documentElement;
+  
+    let requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+    let cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+  
+    if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+      requestFullScreen.call(docEl);
+    }
+    else {
+      cancelFullScreen.call(doc);
+    }
+  }
 
 

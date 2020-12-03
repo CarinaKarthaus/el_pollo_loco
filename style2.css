@@ -1,5 +1,5 @@
 body {
-    font-family: "Bradley Hand ITC";
+    font-family: 'Architects Daughter', cursive;
 }
 
 h1 {
@@ -11,12 +11,14 @@ h1 {
     text-align: center;
     color: white;
     border-radius: 44% 20% 55% 25%;
+    text-shadow: 3px 4px black;
+    border-bottom: 4px solid black;
 }
 
 .wrapper {
-    
-    background-color: rgba(180, 179, 179, 0.699);
-    background: linear-gradient(180deg, rgba(216, 216, 216, 0.699), rgba(180, 179, 179, 0.699),  rgba(122, 121, 121, 0.699));
+     /* background-color: rgba(180, 179, 179, 0.699); */
+    background-color: rgb(31, 29, 29);
+    background: linear-gradient(180deg,rgba(0, 0, 0, 0.838), rgba(15, 15, 15, 0.818), rgba(0, 0, 0, 0.811));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -39,9 +41,16 @@ h1 {
 
 .heading-box {
     z-index: 6;
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* IE10+/Edge */
+    user-select: none;
+    /* Standard */
 }
+
 .overlay {
-    background-color: rgba(100, 110, 116, 0.411);
+    background-color:rgba(0, 0, 0, 0.4);
     position: absolute;
     top: 0;
     bottom: 0;
@@ -51,20 +60,7 @@ h1 {
 }
 
 .canvas-box {
-    background:
-        linear-gradient(135deg,
-        #a32a061e 25%,
-        rgba(0,0,0,0) 25.1%),
-        linear-gradient(225deg,
-        #a32a061e 25%,
-        rgba(0,0,0,0) 25.1%),
-        linear-gradient(315deg,
-        #a32a061e 25%,
-        rgba(0,0,0,0) 25.1%),
-        linear-gradient(45deg,
-        #a32a061e 25%,
-        rgba(0,0,0,0) 25.1%),
-        #cecdcd;
+    background: linear-gradient(135deg, #a32a061e 25%, rgba(0, 0, 0, 0) 25.1%), linear-gradient(225deg, #a32a061e 25%, rgba(0, 0, 0, 0) 25.1%), linear-gradient(315deg, #a32a061e 25%, rgba(0, 0, 0, 0) 25.1%), linear-gradient(45deg, #a32a061e 25%, rgba(0, 0, 0, 0) 25.1%), #cecdcd;
     background-size: 40px 40px;
     background-position: -20px 0, -20px 0, 0 0, 0 0;
     width: 1150px;
@@ -88,7 +84,7 @@ h1 {
     border: none;
     font-weight: bold;
     border-radius: 20% 44% 25% 55%;
-
+    border-bottom: 3px solid black;
 }
 
 .btn-secondary:hover {
@@ -98,10 +94,12 @@ h1 {
 .d-none {
     display: none;
 }
+
 .safari-overlay {
     background-color: gray;
     opacity: 0.3;
 }
+
 .safari-blocker-msg {
     position: absolute;
     top: 20vh;
@@ -120,6 +118,7 @@ h1 {
     z-index: 5;
     opacity: 1;
 }
+
 .safari-blocker-msg h2 {
     font-weight: 900;
     text-decoration: underline;
@@ -139,13 +138,12 @@ h1 {
     border-radius: 8px;
 }
 
-
 /* Screens with lower resolution (max-height: 700px) */
+
 @media (max-width: 1000px), (max-height: 700px) {
     h1 {
         font-size: 2.5rem;
     }
-    
     .btn-box {
         position: absolute;
         bottom: 10vh;
@@ -153,10 +151,9 @@ h1 {
     }
 }
 
-
 /* Smartphones and tablets (Landscape-View) */
-@media (max-width: 830px)  {
 
+@media (max-width: 830px) {
     h1 {
         position: absolute;
         top: 4vh;
@@ -165,9 +162,9 @@ h1 {
         z-index: 5;
         font-size: 3rem;
     }
-    .wrapper {
+    /* .wrapper {
         background-color: rgb(59, 58, 58);
-    }
+    } */
     .heading-box {
         display: flex;
         justify-content: center;
@@ -199,17 +196,14 @@ h1 {
         width: auto;
         z-index: 5;
     }
-
     .restart-btn-mobile {
         font-size: 1.2rem;
         background: rgb(35, 35, 146);
         margin-bottom: unset;
     }
-
     .fullscreen-btn {
         display: none;
     }
-
     .instructions {
         display: none;
     }
@@ -217,7 +211,6 @@ h1 {
         display: flex;
         width: 60vw;
     }
-
     #canvas {
         border-radius: unset;
         border: unset;
@@ -226,12 +219,12 @@ h1 {
     }
 }
 
-/* Smartphones & tablets (portrait-view) */ 
+/* Smartphones & tablets (portrait-view) */
+
 @media (max-width: 450px) and (min-height: 400px) {
-    
-    body{
-        margin:0;
-        overflow:hidden;
+    body {
+        margin: 0;
+        overflow: hidden;
     }
     /* flip screen by 90 degrees when in portrait-view */
     .wrapper {
@@ -251,7 +244,6 @@ h1 {
         width: 100vh;
         height: 100vw;
     }
-
     .mobile-instructions {
         width: 70vw;
     }
@@ -265,9 +257,7 @@ h1 {
     .btn-secondary {
         padding: 0.1rem 1rem;
     }
-
     .restart-btn-mobile {
         padding: 0.1rem 1rem;
     }
 }
-

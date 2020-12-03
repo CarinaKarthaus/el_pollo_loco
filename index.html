@@ -3,18 +3,22 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
     <title>El Pollo Loco</title>  
     <link rel="icon" href="./img/logo.png">
     <link rel="stylesheet" href="./bootstrap.min.css">
-    <link rel="stylesheet" href="./style.css">
-    <script src="./variables.js"></script>
-    <script src="./game.js"></script>
-    <script src="./draw_character.js"></script>
-    <script src="./draw_animations.js"></script> 
-    <script src="./collision_checks.js"></script>
-    <script src="./jquery-3.3.1.slim.min.js"></script>
-    <script src="./touch_processing.js"></script>
+    <link rel="stylesheet" href="./style2.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap" rel="stylesheet">
+    <script src="./js/variables.js"></script>
+    <script src="./js/game.js"></script>
+    <script src="./js/draw_character.js"></script>
+    <script src="./js/draw_animations.js"></script> 
+    <script src="./js/collision_checks.js"></script>
+    <script src="./js/jquery-3.3.1.slim.min.js"></script>
+    <script src="./js/touch_processing.js"></script>
 </head>
 
 <body onload="init(); isSafari()">
@@ -42,10 +46,10 @@
         <div id="btn-box" class="btn-box">
             <button id="start-btn" class="btn btn-secondary" onclick="startGame()">Start!</button>
             <button id="restart-btn" class="btn btn-secondary d-none" onclick="window.location.reload()">Restart!</button>
-            <button id="fullscreen-btn" class="btn btn-secondary fullscreen-btn d-none" onclick="openFullscreen()" >Open in fullscreen</button>
+            <button id="fullscreen-btn" class="btn btn-secondary fullscreen-btn d-none" onclick="openFullscreen()" >Open fullscreen</button>
         </div>
         <div class="overlay" id="overlay"></div>  
     </div>
-    <script src="./safari_blocker.js"></script>
+    <script src="./js/safari_blocker.js"></script>
 </body>
 </html>

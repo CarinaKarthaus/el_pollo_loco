@@ -23,9 +23,12 @@
  function runGameLogic() {
     createChickenList();
     calculateDrawingDetails();
-    listenForKeys();
-    checkForCollision();
-    moveOnMobile();
+    if (!gameFinished) {
+        listenForKeys();
+        checkForCollision();
+        moveOnMobile();
+
+    }
  }
 
  function calculateDrawingDetails() {
